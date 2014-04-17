@@ -302,11 +302,54 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 		});
 		file.add(save);
 
-		JMenuItem saveAs = new JMenuItem("Save As", KeyEvent.VK_A);
-		saveAs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK | ActionEvent.SHIFT_MASK));
+		JMenuItem saveAs = new JMenuItem(new AbstractAction("Save As") {
+			
+			{
+				this.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK | ActionEvent.SHIFT_MASK));
+				this.putValue(MNEMONIC_KEY, KeyEvent.VK_A);
+			}
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				SudokuGame g = ((SudokuBoard) gameTabs.getSelectedComponent()).getGame();
+				JFileChooser fc = new JFileChooser();
+				fc.setSelectedFile(new File(g.getName() + "." + g.getSuffix()));
+				fc.setCurrentDirectory(new File(System.getProperty("user.dir")));
+				int result = fc.showSaveDialog(SudokuGameFrame.this);
+				if (result == JFileChooser.APPROVE_OPTION) {
+					g.saveAt(fc.getSelectedFile());
+					SudokuRegister.save(g);
+				}				
+			}
+			
+		});
 		file.add(saveAs);
 
-		JMenuItem saveAll = new JMenuItem("Save All", KeyEvent.VK_V);
+		JMenuItem saveAll = new JMenuItem(new AbstractAction("Save All") {
+
+			{
+				this.putValue(MNEMONIC_KEY, KeyEvent.VK_V);
+			}
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				for(SudokuGame g: gameReg.values()) {
+					if (g.isSaved()) {
+						SudokuRegister.save(g);
+					} else {
+						JFileChooser fc = new JFileChooser();
+						fc.setSelectedFile(new File(g.getName() + "." + g.getSuffix()));
+						fc.setCurrentDirectory(new File(System.getProperty("user.dir")));
+						int result = fc.showSaveDialog(SudokuGameFrame.this);
+						if (result == JFileChooser.APPROVE_OPTION) {
+							g.saveAt(fc.getSelectedFile());
+							SudokuRegister.save(g);
+						}
+					}
+				}
+			}
+
+		});
 		file.add(saveAll);
 
 		file.addSeparator();
