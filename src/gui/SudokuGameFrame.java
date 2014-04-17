@@ -408,7 +408,7 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 
 			{
 				this.putValue(MNEMONIC_KEY, KeyEvent.VK_V);
-				this.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));
+				this.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK));
 			}
 
 			@Override
