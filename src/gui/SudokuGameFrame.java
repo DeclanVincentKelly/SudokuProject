@@ -121,25 +121,25 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 			}
 
 		});
-		
+
 		toggleMenuItems();
 	}
 
 	private void toggleMenuItems() {
-		if(tabs.getSelectedIndex() == 0) {
-			for(Component c: gameMenuItems)
+		if (tabs.getSelectedIndex() == 0) {
+			for (Component c : gameMenuItems)
 				c.setEnabled(true);
-			
-			for(Component c: libraryMenuItems)
+
+			for (Component c : libraryMenuItems)
 				c.setEnabled(false);
 		} else {
-			for(Component c: gameMenuItems)
+			for (Component c : gameMenuItems)
 				c.setEnabled(false);
-			
-			for(Component c: libraryMenuItems)
+
+			for (Component c : libraryMenuItems)
 				c.setEnabled(true);
 		}
-		
+
 	}
 
 	public void run() {
@@ -157,6 +157,7 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 		else {
 			for (SudokuGame g : gameReg.values())
 				addGame(g);
+
 			return true;
 		}
 	}
@@ -293,8 +294,10 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 					fc.setCurrentDirectory(new File(System.getProperty("user.dir")));
 					int result = fc.showSaveDialog(SudokuGameFrame.this);
 					if (result == JFileChooser.APPROVE_OPTION) {
+						g.setName(fc.getSelectedFile().getName());
 						g.saveAt(fc.getSelectedFile());
 						SudokuRegister.save(g);
+						gameTabs.setTitleAt(gameTabs.getSelectedIndex(), g.getName().substring(0, g.getName().indexOf(g.getSuffix()) - 1));
 					}
 				}
 			}
@@ -303,7 +306,7 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 		file.add(save);
 
 		JMenuItem saveAs = new JMenuItem(new AbstractAction("Save As") {
-			
+
 			{
 				this.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK | ActionEvent.SHIFT_MASK));
 				this.putValue(MNEMONIC_KEY, KeyEvent.VK_A);
@@ -317,11 +320,13 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 				fc.setCurrentDirectory(new File(System.getProperty("user.dir")));
 				int result = fc.showSaveDialog(SudokuGameFrame.this);
 				if (result == JFileChooser.APPROVE_OPTION) {
+					g.setName(fc.getSelectedFile().getName());
 					g.saveAt(fc.getSelectedFile());
 					SudokuRegister.save(g);
-				}				
+					gameTabs.setTitleAt(gameTabs.getSelectedIndex(), g.getName().substring(0, g.getName().indexOf(g.getSuffix()) - 1));
+				}
 			}
-			
+
 		});
 		file.add(saveAs);
 
@@ -333,7 +338,7 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				for(SudokuGame g: gameReg.values()) {
+				for (SudokuGame g : gameReg.values()) {
 					if (g.isSaved()) {
 						SudokuRegister.save(g);
 					} else {
@@ -342,8 +347,10 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 						fc.setCurrentDirectory(new File(System.getProperty("user.dir")));
 						int result = fc.showSaveDialog(SudokuGameFrame.this);
 						if (result == JFileChooser.APPROVE_OPTION) {
+							g.setName(fc.getSelectedFile().getName());
 							g.saveAt(fc.getSelectedFile());
 							SudokuRegister.save(g);
+							gameTabs.setTitleAt(gameTabs.getSelectedIndex(), g.getName().substring(0, g.getName().indexOf(g.getSuffix()) - 1));
 						}
 					}
 				}
@@ -414,7 +421,7 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				SudokuBoard b = (SudokuBoard) gameTabs.getComponentAt(gameTabs.getSelectedIndex());
-				if(!b.getEditConstant())
+				if (!b.getEditConstant())
 					b.setBackground(Color.GRAY);
 				else
 					b.setBackground(new Color(238, 238, 238));
@@ -452,15 +459,15 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 		gameMenuItems.addAll(Arrays.asList(game.getMenuComponents()));
 
 		libraryMenuItems.addAll(Arrays.asList(library.getMenuComponents()));
-		
+
 		ArrayList<Component> toRemove = new ArrayList<Component>();
-		
+
 		for (Component c : gameMenuItems)
 			if (c instanceof JSeparator)
 				toRemove.add(c);
 		gameMenuItems.removeAll(toRemove);
 		toRemove.clear();
-		
+
 		for (Component c : libraryMenuItems)
 			if (c instanceof JSeparator)
 				toRemove.add(c);

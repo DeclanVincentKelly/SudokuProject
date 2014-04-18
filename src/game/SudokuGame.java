@@ -35,7 +35,7 @@ public class SudokuGame implements SudokuSerializable {
 	private static final Color completeColor = new Color(0x30DB00);
 	private static final Color duplicateColor = new Color(0xD42F2F);
 
-	private volatile String name;
+	private String name;
 	private File save;
 
 	/**

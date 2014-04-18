@@ -17,14 +17,14 @@ public class SudokuRegister<T extends SudokuSerializable> implements Serializabl
 	 */
 	private static final long serialVersionUID = 5580281115018204171L;
 
-	private HashMap<String, T> registeredGames = new HashMap<String, T>();
+	private HashMap<String, T> registered = new HashMap<String, T>();
 
 	public void register(String n, T g) {
-		registeredGames.put(n, g);
+		registered.put(n, g);
 	}
 
 	public void deregister(String n) {
-		registeredGames.remove(n);
+		registered.remove(n);
 	}
 
 	public void saveState(String n) {
@@ -50,7 +50,7 @@ public class SudokuRegister<T extends SudokuSerializable> implements Serializabl
 			e.printStackTrace();
 			temp = new SudokuRegister<T>();
 		}
-		this.registeredGames = temp.registeredGames;
+		this.registered = temp.registered;
 	}
 
 	public static SudokuSerializable load(File in) {
@@ -86,7 +86,7 @@ public class SudokuRegister<T extends SudokuSerializable> implements Serializabl
 	 * @see java.util.HashMap#isEmpty()
 	 */
 	public boolean isEmpty() {
-		return registeredGames.isEmpty();
+		return registered.isEmpty();
 	}
 
 	/**
@@ -95,7 +95,7 @@ public class SudokuRegister<T extends SudokuSerializable> implements Serializabl
 	 * @see java.util.HashMap#containsKey(java.lang.Object)
 	 */
 	public boolean containsKey(Object key) {
-		return registeredGames.containsKey(key);
+		return registered.containsKey(key);
 	}
 
 	/**
@@ -103,7 +103,7 @@ public class SudokuRegister<T extends SudokuSerializable> implements Serializabl
 	 * @see java.util.HashMap#clear()
 	 */
 	public void clear() {
-		registeredGames.clear();
+		registered.clear();
 	}
 
 	/**
@@ -112,7 +112,7 @@ public class SudokuRegister<T extends SudokuSerializable> implements Serializabl
 	 * @see java.util.HashMap#containsValue(java.lang.Object)
 	 */
 	public boolean containsValue(Object value) {
-		return registeredGames.containsValue(value);
+		return registered.containsValue(value);
 	}
 
 	/**
@@ -120,7 +120,7 @@ public class SudokuRegister<T extends SudokuSerializable> implements Serializabl
 	 * @see java.util.HashMap#values()
 	 */
 	public Collection<T> values() {
-		return registeredGames.values();
+		return registered.values();
 	}
 
 }
