@@ -123,6 +123,14 @@ public class SudokuGame implements SudokuSerializable {
 				for (Cell c : r.getDuplicates())
 					c.setColor(duplicateColor);
 	}
+	
+	public boolean isWon() {
+		for (Region[] ra : regions)
+			for (Region r : ra)
+				if(!r.isComplete() || r.getDuplicates().length != 0)
+					return false;
+		return true;
+	}
 
 	@Override
 	public String toString() {

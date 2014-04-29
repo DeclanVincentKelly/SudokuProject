@@ -26,10 +26,11 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
+import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
@@ -42,7 +43,7 @@ import library.SudokuLibrary;
 public class SudokuGameFrame extends JFrame implements Runnable {
 
 	private JTabbedPane tabs = new JTabbedPane();
-	private JPanel libraryTab = new JPanel();
+	private JPanel libraryPanel = new JPanel();
 	private JTabbedPane gameTabs = new JTabbedPane(JTabbedPane.BOTTOM);
 	private JMenuBar menu = new JMenuBar();
 	private SudokuRegister<SudokuGame> gameReg = new SudokuRegister<SudokuGame>();
@@ -60,9 +61,11 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 	public SudokuGameFrame() {
 		super("Sudoku");
 
+		// Reload previous games if any
 		if (!loadPrevious())
-			addGame(new SudokuGame("New Game"));
+			addGame(new SudokuGame("Unsaved Game"), false);
 
+		// Add icons
 		Image img = null;
 		try {
 			img = ImageIO.read(SudokuGameFrame.class.getResourceAsStream("/res/main.png"));
@@ -72,23 +75,23 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 		}
 		setIconImage(img);
 
+		// Set up tabs
 		add(tabs);
 		try {
-			tabs.addTab("Game Board", new ImageIcon(ImageIO.read(SudokuGameFrame.class.getResourceAsStream("/res/board.png"))), gameTabs);
-			tabs.addTab("Game Library", new ImageIcon(ImageIO.read(SudokuGameFrame.class.getResourceAsStream("/res/library.png"))), libraryTab);
+			tabs.addTab("Game Boards", new ImageIcon(ImageIO.read(SudokuGameFrame.class.getResourceAsStream("/res/board.png"))), gameTabs);
+			tabs.addTab("Game Libraries", new ImageIcon(ImageIO.read(SudokuGameFrame.class.getResourceAsStream("/res/library.png"))), libraryPanel);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
 		tabs.setFocusable(false);
-
 		gameTabs.setFocusable(false);
 
-		// TODO Insert arrangements for Game Library JPanel (Possible a JTree
-		// and a search boxs)
+		initializeTree();
 
 		setJMenuBar(menu);
 		addMenuItems(menu);
 
+		// Add listener for saving the game(s) after the window has closed
 		addWindowListener(new WindowAdapter() {
 
 			@Override
@@ -98,6 +101,8 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 
 		});
 
+		// Add listeners for dynamic removal of game tabs
+		// and for the toggling between the two main tabs
 		gameTabs.addContainerListener(new ContainerListener() {
 
 			@Override
@@ -123,6 +128,12 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 		});
 
 		toggleMenuItems();
+	}
+
+	private void initializeTree() {
+		JTree testing = new JTree();
+		JScrollPane sp = new JScrollPane(testing);
+		libraryPanel.add(sp);
 	}
 
 	private void toggleMenuItems() {
@@ -156,13 +167,13 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 			return false;
 		else {
 			for (SudokuGame g : gameReg.values())
-				addGame(g);
+				addGame(g, true);
 
 			return true;
 		}
 	}
 
-	private void addGame(SudokuGame g) {
+	private void addGame(SudokuGame g, boolean alreadyIn) {
 		if (!isUnique(g.getName()))
 			g.setName(g.getName() + " (1)");
 
@@ -173,7 +184,8 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 		}
 
 		gameTabs.addTab(g.getName(), new SudokuBoard(g));
-		gameReg.register(g.getName(), g);
+		if (!alreadyIn)
+			gameReg.register(g.getName(), g);
 
 	}
 
@@ -199,12 +211,8 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String name = JOptionPane.showInputDialog(SudokuGameFrame.this, "Enter the name for the new game", "New Game", JOptionPane.QUESTION_MESSAGE);
-				if (name == null || name.equals(""))
-					name = "New Game";
-
-				SudokuGame g = new SudokuGame(name);
-				addGame(g);
+				SudokuGame g = new SudokuGame("Unsaved Game");
+				addGame(g, false);
 
 				repaint();
 			}
@@ -229,7 +237,7 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
 					SudokuGame g = (SudokuGame) SudokuRegister.load(fc.getSelectedFile());
 					g.setName(fc.getSelectedFile().getName().substring(0, fc.getSelectedFile().getName().indexOf(".")));
-					addGame(g);
+					addGame(g, false);
 					g.saveAt(fc.getSelectedFile());
 				}
 			}

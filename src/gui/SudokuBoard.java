@@ -194,6 +194,8 @@ public class SudokuBoard extends JPanel {
 		if (!editConstant) {
 			drawBoxes(g2);
 			drawOccupants(g2);
+			if(game.isWon())
+				drawWin();
 		} else {
 			drawConstantBoxes(g2);
 			drawFadedContents(g2);
@@ -279,6 +281,10 @@ public class SudokuBoard extends JPanel {
 		}
 
 		g.setColor(defaultColor);
+	}
+	
+	private void drawWin() {
+		//TODO Complete the win animation
 	}
 
 	@Override
