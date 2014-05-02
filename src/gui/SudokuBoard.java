@@ -27,12 +27,13 @@ import javax.swing.KeyStroke;
 public class SudokuBoard extends JPanel {
 
 	private final SudokuGame game;
-	private final Color backgroundColor = Color.WHITE;
-	private final Color defaultColor = Color.BLACK;
-	private final int cellSize = 55;
-	private final int borderWidth = 6;
-	private final int dx = 20, dy = 40;
-	private Rectangle[][] boxes = new Rectangle[9][9];
+	private static final Color backgroundColor = Color.WHITE;
+	private static final Color defaultColor = Color.BLACK;
+	private static final int cellSize = 55;
+	private static final int borderWidth = 6;
+	private static final int dx = 20, dy = 40;
+	private static final int boxLength = 9;
+	private Rectangle[][] boxes = new Rectangle[boxLength][boxLength];
 	private boolean engaged = false;
 	private Point selection = new Point(0, 0);
 	private boolean editConstant = false;
@@ -289,7 +290,12 @@ public class SudokuBoard extends JPanel {
 
 	@Override
 	public Dimension getPreferredSize() {
-		int l = (int) ((2 * (borderWidth - 1)) + (boxes.length * (boxes[0][0].getWidth() + 2)) + (2 * (boxes.length - 1)) + (2 * borderWidth));
+		// TODO Auto-generated method stub
+		return SudokuBoard.getBoardPreferredSize();
+	}
+	
+	public static Dimension getBoardPreferredSize() {
+		int l = (int) ((2 * (borderWidth - 1)) + (boxLength * (cellSize + 4)) + (2 * (boxLength - 1)) + (2 * borderWidth));
 		return new Dimension(l, l);
 	}
 

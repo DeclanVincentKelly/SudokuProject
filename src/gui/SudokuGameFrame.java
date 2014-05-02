@@ -6,6 +6,7 @@ import game.SudokuGame;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ContainerEvent;
@@ -43,7 +44,7 @@ import library.SudokuLibrary;
 public class SudokuGameFrame extends JFrame implements Runnable {
 
 	private JTabbedPane tabs = new JTabbedPane();
-	private JPanel libraryPanel = new JPanel();
+	private JPanel libraryPanel = new LibraryPanel();
 	private JTabbedPane gameTabs = new JTabbedPane(JTabbedPane.BOTTOM);
 	private JMenuBar menu = new JMenuBar();
 	private SudokuRegister<SudokuGame> gameReg = new SudokuRegister<SudokuGame>();
@@ -86,7 +87,9 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 		tabs.setFocusable(false);
 		gameTabs.setFocusable(false);
 
-		initializeTree();
+		JScrollPane test = new JScrollPane(new JTree());
+		libraryPanel.add(test);
+		test.setPreferredSize(SudokuBoard.getBoardPreferredSize());
 
 		setJMenuBar(menu);
 		addMenuItems(menu);
@@ -128,12 +131,6 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 		});
 
 		toggleMenuItems();
-	}
-
-	private void initializeTree() {
-		JTree testing = new JTree();
-		JScrollPane sp = new JScrollPane(testing);
-		libraryPanel.add(sp);
 	}
 
 	private void toggleMenuItems() {
