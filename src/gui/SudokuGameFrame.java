@@ -5,8 +5,6 @@ package gui;
 import game.SudokuGame;
 
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ContainerEvent;
@@ -16,44 +14,27 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
-import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
-import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
-import library.SudokuLibrary;
 
 @SuppressWarnings("serial")
 public class SudokuGameFrame extends JFrame implements Runnable {
 
-	private JTabbedPane tabs = new JTabbedPane();
-	private JPanel libraryPanel = new LibraryPanel();
 	private JTabbedPane gameTabs = new JTabbedPane(JTabbedPane.BOTTOM);
 	private JMenuBar menu = new JMenuBar();
 	private SudokuRegister<SudokuGame> gameReg = new SudokuRegister<SudokuGame>();
-	private SudokuRegister<SudokuLibrary> libReg = new SudokuRegister<SudokuLibrary>();
-	private ArrayList<Component> gameMenuItems = new ArrayList<Component>();
-	private ArrayList<Component> libraryMenuItems = new ArrayList<Component>();
 
 	private static final String prevFileGame = "prevGameState.ser";
-	private static final String prevFileLib = "prevLibState.ser";
 
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new SudokuGameFrame());
@@ -75,21 +56,6 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 			e.printStackTrace();
 		}
 		setIconImage(img);
-
-		// Set up tabs
-		add(tabs);
-		try {
-			tabs.addTab("Game Boards", new ImageIcon(ImageIO.read(SudokuGameFrame.class.getResourceAsStream("/res/board.png"))), gameTabs);
-			tabs.addTab("Game Libraries", new ImageIcon(ImageIO.read(SudokuGameFrame.class.getResourceAsStream("/res/library.png"))), libraryPanel);
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		tabs.setFocusable(false);
-		gameTabs.setFocusable(false);
-
-		JScrollPane test = new JScrollPane(new JTree());
-		libraryPanel.add(test);
-		test.setPreferredSize(SudokuBoard.getBoardPreferredSize());
 
 		setJMenuBar(menu);
 		addMenuItems(menu);
@@ -120,33 +86,6 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 			}
 
 		});
-
-		tabs.addChangeListener(new ChangeListener() {
-
-			@Override
-			public void stateChanged(ChangeEvent e) {
-				toggleMenuItems();
-			}
-
-		});
-
-		toggleMenuItems();
-	}
-
-	private void toggleMenuItems() {
-		if (tabs.getSelectedIndex() == 0) {
-			for (Component c : gameMenuItems)
-				c.setEnabled(true);
-
-			for (Component c : libraryMenuItems)
-				c.setEnabled(false);
-		} else {
-			for (Component c : gameMenuItems)
-				c.setEnabled(false);
-
-			for (Component c : libraryMenuItems)
-				c.setEnabled(true);
-		}
 
 	}
 
@@ -240,6 +179,7 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 			}
 
 		});
+		
 		file.add(openGame);
 
 		file.addSeparator();
@@ -437,47 +377,9 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 		});
 		game.add(setValues);
 
-		JMenu library = new JMenu("Library");
-		library.setMnemonic(KeyEvent.VK_L);
-
-		JMenuItem openLib = new JMenuItem("Open Library", KeyEvent.VK_O);
-		library.add(openLib);
-
-		JMenuItem closeLib = new JMenuItem("Close Library", KeyEvent.VK_C);
-		library.add(closeLib);
-
-		JMenuItem saveLib = new JMenuItem("Save Library", KeyEvent.VK_S);
-		library.add(saveLib);
-
-		library.addSeparator();
-
-		JMenuItem changeActive = new JMenuItem("Change Active Library", KeyEvent.VK_A);
-		library.add(changeActive);
-
 		bar.add(file);
 		bar.add(view);
 		bar.add(game);
-		bar.add(library);
-
-		gameMenuItems.addAll(Arrays.asList(file.getMenuComponents()));
-		gameMenuItems.addAll(Arrays.asList(view.getMenuComponents()));
-		gameMenuItems.addAll(Arrays.asList(game.getMenuComponents()));
-
-		libraryMenuItems.addAll(Arrays.asList(library.getMenuComponents()));
-
-		ArrayList<Component> toRemove = new ArrayList<Component>();
-
-		for (Component c : gameMenuItems)
-			if (c instanceof JSeparator)
-				toRemove.add(c);
-		gameMenuItems.removeAll(toRemove);
-		toRemove.clear();
-
-		for (Component c : libraryMenuItems)
-			if (c instanceof JSeparator)
-				toRemove.add(c);
-		libraryMenuItems.removeAll(toRemove);
-		toRemove.clear();
 	}
 
 }
