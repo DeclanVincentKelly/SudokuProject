@@ -5,6 +5,7 @@ package game;
 import java.awt.Color;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Region implements Serializable {
 
@@ -65,5 +66,11 @@ public class Region implements Serializable {
 	public void colorAll(Color a) {
 		for (Cell c : cells)
 			c.setColor(a);
+	}
+	
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return Arrays.toString(cells);
 	}
 }

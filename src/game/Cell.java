@@ -31,6 +31,8 @@ public class Cell implements Serializable {
 	 * 
 	 */
 	private final Point point;
+	
+	protected final Region[] regions = new Region[3];
 
 	/**
 	 * Class default constructor specifying initial values of
@@ -103,6 +105,10 @@ public class Cell implements Serializable {
 	public void setEditable(boolean editable) {
 		this.editable = editable;
 	}
+	
+	protected void setRegion(int i, Region r) {
+		regions[i] = r;
+	}
 
 	/**
 	 * @return the point
@@ -113,6 +119,7 @@ public class Cell implements Serializable {
 	
 	@Override
 	public String toString() {
-		return point + ":" + color + ":" + cellContent;
+		//return point + ":" + color + ":" + cellContent;
+		return Integer.toString(cellContent);
 	}
 }

@@ -291,7 +291,6 @@ public class SudokuBoard extends JPanel {
 
 	@Override
 	public Dimension getPreferredSize() {
-		// TODO Auto-generated method stub
 		return SudokuBoard.getBoardPreferredSize();
 	}
 	

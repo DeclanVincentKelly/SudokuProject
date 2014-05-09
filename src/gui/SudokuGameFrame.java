@@ -17,14 +17,11 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
-import javax.swing.JColorChooser;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
@@ -99,13 +96,11 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 
 			@Override
 			public boolean accept(File f) {
-				// TODO Auto-generated method stub
 				return f.getName().endsWith(".game") || f.isDirectory();
 			}
 
 			@Override
 			public String getDescription() {
-				// TODO Auto-generated method stub
 				return "Sudoku Games (*.game)";
 			}
 			

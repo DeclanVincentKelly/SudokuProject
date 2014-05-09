@@ -38,8 +38,6 @@ public class SudokuRegister<T extends SudokuSerializable> implements Serializabl
 	}
 
 	private boolean isUnique(String name) {
-		// TODO Auto-generated method stub
-
 		for (T g : registered)
 			if (g.getName().equals(name))
 				return false;

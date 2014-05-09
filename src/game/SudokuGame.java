@@ -17,7 +17,7 @@ public class SudokuGame implements SudokuSerializable {
 	 * This array represents the game board with 81 individual cells capable of
 	 * different content and color
 	 */
-	private Cell[][] cells = new Cell[9][9];
+	protected Cell[][] cells = new Cell[9][9];
 
 	/**
 	 * This array represents the different regions of the board that must have
@@ -48,16 +48,33 @@ public class SudokuGame implements SudokuSerializable {
 			for (int x = 0; x < cells[y].length; x++)
 				cells[y][x] = new Cell(x, y);
 
-		for (int i = 0; i < regions[0].length; i++)
-			regions[0][i] = new Region(Arrays.copyOfRange(cells[i], 0, cells[i].length));
+		//Rows
+		for (int i = 0; i < regions[0].length; i++) {
+			Cell[] region = Arrays.copyOfRange(cells[i], 0, cells[i].length);
+			regions[0][i] = new Region(region);
+			
+			for(Cell c: Arrays.copyOfRange(cells[i], 0, cells[i].length))
+				c.setRegion(0, regions[0][i]);
+		}
 
-		for (int i = 0; i < regions[1].length; i++)
-			regions[1][i] = new Region(new Cell[] { cells[0][0 + i], cells[1][0 + i], cells[2][0 + i], cells[3][0 + i], cells[4][0 + i], cells[5][0 + i], cells[6][0 + i], cells[7][0 + i], cells[8][0 + i] });
-
+		//Columns
+		for (int i = 0; i < regions[1].length; i++) {
+			Cell[] region = new Cell[] { cells[0][0 + i], cells[1][0 + i], cells[2][0 + i], cells[3][0 + i], cells[4][0 + i], cells[5][0 + i], cells[6][0 + i], cells[7][0 + i], cells[8][0 + i] };
+			regions[1][i] = new Region(region);
+			
+			for(Cell c: region)
+				c.setRegion(1, regions[1][i]);
+		}
+			
+		//Squares
 		int j = 0;
 		for (int i = 0; i < 3; i++)
 			for (int x = 0; x < 3; x++) {
-				regions[2][j] = new Region(new Cell[] { cells[0 + (3 * i)][0 + (3 * x)], cells[0 + (3 * i)][1 + (3 * x)], cells[0 + (3 * i)][2 + (3 * x)], cells[1 + (3 * i)][0 + (3 * x)], cells[1 + (3 * i)][1 + (3 * x)], cells[1 + (3 * i)][2 + (3 * x)], cells[2 + (3 * i)][0 + (3 * x)], cells[2 + (3 * i)][1 + (3 * x)], cells[2 + (3 * i)][2 + (3 * x)] });
+				Cell[] region = new Cell[] { cells[0 + (3 * i)][0 + (3 * x)], cells[0 + (3 * i)][1 + (3 * x)], cells[0 + (3 * i)][2 + (3 * x)], cells[1 + (3 * i)][0 + (3 * x)], cells[1 + (3 * i)][1 + (3 * x)], cells[1 + (3 * i)][2 + (3 * x)], cells[2 + (3 * i)][0 + (3 * x)], cells[2 + (3 * i)][1 + (3 * x)], cells[2 + (3 * i)][2 + (3 * x)] };
+				regions[2][j] = new Region(region);
+				
+				for(Cell c: region)
+					c.setRegion(2, regions[2][j]);
 				j++;
 			}
 
@@ -147,7 +164,6 @@ public class SudokuGame implements SudokuSerializable {
 
 	@Override
 	public File getSave() {
-		// TODO Auto-generated method stub
 		return save;
 	}
 
