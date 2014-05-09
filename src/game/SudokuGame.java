@@ -6,8 +6,8 @@ import gui.SudokuSerializable;
 
 import java.awt.Color;
 import java.io.File;
+import java.util.ArrayDeque;
 import java.util.Arrays;
-import java.util.Stack;
 
 public class SudokuGame implements SudokuSerializable {
 
@@ -29,7 +29,7 @@ public class SudokuGame implements SudokuSerializable {
 	 * The two stacks in charge of any undo/redo operations
 	 */
 	@SuppressWarnings("unused")
-	private Stack<Turn> history, future;
+	private ArrayDeque<Turn> history, future;
 
 	private static final Color defaultColor = new Color(0x000000);
 	private static final Color completeColor = new Color(0x30DB00);
@@ -37,13 +37,6 @@ public class SudokuGame implements SudokuSerializable {
 
 	private String name;
 	private File save;
-
-	/**
-	 * 
-	 */
-	public SudokuGame() {
-		this("Default Game");
-	}
 
 	/**
 	 * Constructs a new SudokuGame with a completely blank board and given name
@@ -148,7 +141,7 @@ public class SudokuGame implements SudokuSerializable {
 	}
 
 	@Override
-	public void saveAt(File f) {
+	public void setSave(File f) {
 		save = f;
 	}
 

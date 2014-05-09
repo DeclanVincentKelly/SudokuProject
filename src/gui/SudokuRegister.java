@@ -7,8 +7,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 
 public class SudokuRegister<T extends SudokuSerializable> implements Serializable {
 
@@ -17,14 +17,37 @@ public class SudokuRegister<T extends SudokuSerializable> implements Serializabl
 	 */
 	private static final long serialVersionUID = 5580281115018204171L;
 
-	private HashMap<String, T> registered = new HashMap<String, T>();
+	private ArrayList<T> registered = new ArrayList<T>();
 
-	public void register(String n, T g) {
-		registered.put(n, g);
+	public void register(T g) {
+		if (!registered.contains(g)) {
+			String newName = g.getName();
+			if (!isUnique(g.getName())) {
+				int count = 1;
+				String orig = newName;
+				do {
+					newName = orig + " (" + count + ")";
+					count++;
+
+				} while (!isUnique(newName));
+			}
+			g.setName(newName);
+
+			registered.add(g);
+		}
 	}
 
-	public void deregister(String n) {
-		registered.remove(n);
+	private boolean isUnique(String name) {
+		// TODO Auto-generated method stub
+
+		for (T g : registered)
+			if (g.getName().equals(name))
+				return false;
+		return true;
+	}
+
+	public void deregister(int i) {
+		registered.remove(i);
 	}
 
 	public void saveState(String n) {
@@ -55,7 +78,7 @@ public class SudokuRegister<T extends SudokuSerializable> implements Serializabl
 
 	public static SudokuSerializable load(File in) {
 		SudokuSerializable re = null;
-		
+
 		try {
 			FileInputStream fis = new FileInputStream(in);
 			ObjectInputStream ois = new ObjectInputStream(fis);
@@ -64,7 +87,7 @@ public class SudokuRegister<T extends SudokuSerializable> implements Serializabl
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-		
+
 		return re;
 
 	}
@@ -81,46 +104,24 @@ public class SudokuRegister<T extends SudokuSerializable> implements Serializabl
 		}
 	}
 
-	/**
-	 * @return
-	 * @see java.util.HashMap#isEmpty()
-	 */
 	public boolean isEmpty() {
 		return registered.isEmpty();
 	}
 
-	/**
-	 * @param key
-	 * @return
-	 * @see java.util.HashMap#containsKey(java.lang.Object)
-	 */
-	public boolean containsKey(Object key) {
-		return registered.containsKey(key);
+	public boolean contains(T obj) {
+		return registered.contains(obj);
 	}
 
-	/**
-	 * 
-	 * @see java.util.HashMap#clear()
-	 */
 	public void clear() {
 		registered.clear();
 	}
 
-	/**
-	 * @param value
-	 * @return
-	 * @see java.util.HashMap#containsValue(java.lang.Object)
-	 */
-	public boolean containsValue(Object value) {
-		return registered.containsValue(value);
+	public int indexOf(T obj) {
+		return registered.indexOf(obj);
 	}
 
-	/**
-	 * @return
-	 * @see java.util.HashMap#values()
-	 */
 	public Collection<T> values() {
-		return registered.values();
+		return registered;
 	}
 
 }

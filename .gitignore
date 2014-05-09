@@ -2,3 +2,5 @@
 /bin
 /doc
 /holding
+/def
+*.game

@@ -17,15 +17,18 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
+import javax.swing.JColorChooser;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
-import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.filechooser.FileFilter;
 
 @SuppressWarnings("serial")
 public class SudokuGameFrame extends JFrame implements Runnable {
@@ -33,6 +36,7 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 	private JTabbedPane gameTabs = new JTabbedPane(JTabbedPane.BOTTOM);
 	private JMenuBar menu = new JMenuBar();
 	private SudokuRegister<SudokuGame> gameReg = new SudokuRegister<SudokuGame>();
+	private JFileChooser chooser = new JFileChooser(new File(System.getProperty("user.dir")));
 
 	private static final String prevFileGame = "prevGameState.ser";
 
@@ -45,7 +49,7 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 
 		// Reload previous games if any
 		if (!loadPrevious())
-			addGame(new SudokuGame("Unsaved Game"), false);
+			addGame(new SudokuGame("Unsaved Game"));
 
 		// Add icons
 		Image img = null;
@@ -56,6 +60,10 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 			e.printStackTrace();
 		}
 		setIconImage(img);
+
+		gameTabs.setBackground(Color.WHITE);
+		gameTabs.setFocusable(false);
+		add(gameTabs);
 
 		setJMenuBar(menu);
 		addMenuItems(menu);
@@ -86,7 +94,22 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 			}
 
 		});
+		
+		chooser.setFileFilter(new FileFilter() {
 
+			@Override
+			public boolean accept(File f) {
+				// TODO Auto-generated method stub
+				return f.getName().endsWith(".game") || f.isDirectory();
+			}
+
+			@Override
+			public String getDescription() {
+				// TODO Auto-generated method stub
+				return "Sudoku Games (*.game)";
+			}
+			
+		});
 	}
 
 	public void run() {
@@ -101,37 +124,20 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 		gameReg.loadState(prevFileGame);
 		if (gameReg.isEmpty())
 			return false;
-		else {
+		else {			
 			for (SudokuGame g : gameReg.values())
-				addGame(g, true);
+				addGame(g);
 
 			return true;
 		}
 	}
 
-	private void addGame(SudokuGame g, boolean alreadyIn) {
-		if (!isUnique(g.getName()))
-			g.setName(g.getName() + " (1)");
-
-		int count = 2;
-		while (!isUnique(g.getName())) {
-			g.setName(g.getName().substring(0, g.getName().length() - (g.getName().length() - g.getName().lastIndexOf("("))) + "(" + count + ")");
-			count++;
-		}
-
+	private void addGame(SudokuGame g) {
+		gameReg.register(g);
 		gameTabs.addTab(g.getName(), new SudokuBoard(g));
-		if (!alreadyIn)
-			gameReg.register(g.getName(), g);
-
 	}
 
-	private boolean isUnique(String name) {
-		for (int i = 0; i < gameTabs.getTabCount(); i++)
-			if (((SudokuBoard) gameTabs.getComponentAt(i)).getGame().getName().equals(name))
-				return false;
 
-		return true;
-	}
 
 	// TODO Add actions
 	private void addMenuItems(JMenuBar bar) {
@@ -148,7 +154,7 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				SudokuGame g = new SudokuGame("Unsaved Game");
-				addGame(g, false);
+				addGame(g);
 
 				repaint();
 			}
@@ -165,21 +171,17 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JFileChooser fc = new JFileChooser();
-				fc.setCurrentDirectory(new File(System.getProperty("user.dir")));
-				FileNameExtensionFilter filter = new FileNameExtensionFilter("Sudoku Games", "game");
-				fc.setFileFilter(filter);
-				int returnVal = fc.showOpenDialog(SudokuGameFrame.this);
+				int returnVal = chooser.showOpenDialog(SudokuGameFrame.this);
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
-					SudokuGame g = (SudokuGame) SudokuRegister.load(fc.getSelectedFile());
-					g.setName(fc.getSelectedFile().getName().substring(0, fc.getSelectedFile().getName().indexOf(".")));
-					addGame(g, false);
-					g.saveAt(fc.getSelectedFile());
+					SudokuGame g = (SudokuGame) SudokuRegister.load(chooser.getSelectedFile());
+					g.setName(chooser.getSelectedFile().getName().substring(0, chooser.getSelectedFile().getName().indexOf(g.getSuffix()) - 1));
+					addGame(g);
+					g.setSave(chooser.getSelectedFile());
 				}
 			}
 
 		});
-		
+
 		file.add(openGame);
 
 		file.addSeparator();
@@ -194,7 +196,7 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				SudokuBoard temp = (SudokuBoard) gameTabs.getSelectedComponent();
-				gameReg.deregister(temp.getGame().getName());
+				gameReg.deregister(gameReg.indexOf(temp.getGame()));
 				gameTabs.remove(temp);
 				repaint();
 			}
@@ -234,15 +236,13 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 				if (g.isSaved()) {
 					SudokuRegister.save(g);
 				} else {
-					JFileChooser fc = new JFileChooser();
-					fc.setSelectedFile(new File(g.getName() + "." + g.getSuffix()));
-					fc.setCurrentDirectory(new File(System.getProperty("user.dir")));
-					int result = fc.showSaveDialog(SudokuGameFrame.this);
+					chooser.setSelectedFile(new File(g.getName()));
+					int result = chooser.showSaveDialog(SudokuGameFrame.this);
 					if (result == JFileChooser.APPROVE_OPTION) {
-						g.setName(fc.getSelectedFile().getName());
-						g.saveAt(fc.getSelectedFile());
+						g.setName(chooser.getSelectedFile().getName().substring(0, chooser.getSelectedFile().getName().indexOf(g.getSuffix()) - 1));
+						g.setSave(chooser.getSelectedFile());
 						SudokuRegister.save(g);
-						gameTabs.setTitleAt(gameTabs.getSelectedIndex(), g.getName().substring(0, g.getName().indexOf(g.getSuffix()) - 1));
+						gameTabs.setTitleAt(gameTabs.getSelectedIndex(), g.getName());
 					}
 				}
 			}
@@ -260,15 +260,14 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				SudokuGame g = ((SudokuBoard) gameTabs.getSelectedComponent()).getGame();
-				JFileChooser fc = new JFileChooser();
-				fc.setSelectedFile(new File(g.getName() + "." + g.getSuffix()));
-				fc.setCurrentDirectory(new File(System.getProperty("user.dir")));
-				int result = fc.showSaveDialog(SudokuGameFrame.this);
+				
+				chooser.setSelectedFile(new File(g.getName() + "." + g.getSuffix()));
+				int result = chooser.showSaveDialog(SudokuGameFrame.this);
 				if (result == JFileChooser.APPROVE_OPTION) {
-					g.setName(fc.getSelectedFile().getName());
-					g.saveAt(fc.getSelectedFile());
+					g.setName(chooser.getSelectedFile().getName().substring(0, chooser.getSelectedFile().getName().indexOf(g.getSuffix()) - 1));
+					g.setSave(chooser.getSelectedFile());
 					SudokuRegister.save(g);
-					gameTabs.setTitleAt(gameTabs.getSelectedIndex(), g.getName().substring(0, g.getName().indexOf(g.getSuffix()) - 1));
+					gameTabs.setTitleAt(gameTabs.getSelectedIndex(), g.getName());
 				}
 			}
 
@@ -287,15 +286,14 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 					if (g.isSaved()) {
 						SudokuRegister.save(g);
 					} else {
-						JFileChooser fc = new JFileChooser();
-						fc.setSelectedFile(new File(g.getName() + "." + g.getSuffix()));
-						fc.setCurrentDirectory(new File(System.getProperty("user.dir")));
-						int result = fc.showSaveDialog(SudokuGameFrame.this);
+						
+						chooser.setSelectedFile(new File(g.getName() + "." + g.getSuffix()));
+						int result = chooser.showSaveDialog(SudokuGameFrame.this);
 						if (result == JFileChooser.APPROVE_OPTION) {
-							g.setName(fc.getSelectedFile().getName());
-							g.saveAt(fc.getSelectedFile());
+							g.setName(chooser.getSelectedFile().getName().substring(0, chooser.getSelectedFile().getName().indexOf(g.getSuffix()) - 1));
+							g.setSave(chooser.getSelectedFile());
 							SudokuRegister.save(g);
-							gameTabs.setTitleAt(gameTabs.getSelectedIndex(), g.getName().substring(0, g.getName().indexOf(g.getSuffix()) - 1));
+							gameTabs.setTitleAt(gameTabs.getSelectedIndex(), g.getName());
 						}
 					}
 				}
@@ -367,9 +365,9 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 			public void actionPerformed(ActionEvent e) {
 				SudokuBoard b = (SudokuBoard) gameTabs.getComponentAt(gameTabs.getSelectedIndex());
 				if (!b.getEditConstant())
-					b.setBackground(Color.GRAY);
+					b.setBackground(new Color(120, 120, 120));
 				else
-					b.setBackground(new Color(238, 238, 238));
+					b.setBackground(Color.WHITE);
 				b.setEditConstant(!b.getEditConstant());
 				b.repaint();
 			}

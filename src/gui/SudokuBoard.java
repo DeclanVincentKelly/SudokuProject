@@ -42,6 +42,7 @@ public class SudokuBoard extends JPanel {
 		this.game = g;
 		createBoxes();
 		setFocusable(true);
+		setBackground(backgroundColor);
 
 		addMouseWheelListener(new MouseWheelListener() {
 

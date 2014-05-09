@@ -4,13 +4,16 @@ import java.io.File;
 import java.io.Serializable;
 
 public interface SudokuSerializable extends Serializable {
-	public String getSuffix();
 
-	public boolean isSaved();
+	boolean isSaved();
 
-	public void saveAt(File f);
-	
-	public File getSave();
-	
-	public String getName();
+	File getSave();
+
+	void setSave(File f);
+
+	String getName();
+
+	void setName(String s);
+
+	String getSuffix();
 }
