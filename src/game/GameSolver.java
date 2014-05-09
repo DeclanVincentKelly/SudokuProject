@@ -14,7 +14,8 @@ public class GameSolver {
 	// C:\Users\Declan\workspace\SudokuProject\def\Default Library\Easy\E001.game
 
 	public static void main(String[] args) {
-		//Loading
+		
+		// Loading
 		SudokuGame temp = null;
 		try {
 			temp = (SudokuGame) (new ObjectInputStream(new FileInputStream("C:\\Users\\Declan\\workspace\\SudokuProject\\def\\Default Library\\Easy\\E003.game"))).readObject();
@@ -28,9 +29,8 @@ public class GameSolver {
 				if (c.getContent() != 0)
 					g.get(c.getPoint().x, c.getPoint().y).setEditable(false);
 			}
-		
-		
-		//Solving
+
+		// Solving
 
 		displayGrid(g);
 
@@ -52,22 +52,17 @@ public class GameSolver {
 			return true;
 		else {
 			ArrayList<Integer> poss = calculatePossible(g, p);
-			
-			for (Integer i : poss) {
-				System.out.println(poss + " " + poss.hashCode());
-				
-				g.set(p.y, p.x, i);
-				
-				System.out.println(p + "->" + i);
-				displayGrid(g);
-				System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-				
-				if(!solve(g, nextPoint(g)))
+			Integer prev = 0;
+
+			for (int j = 0; j < poss.size(); j++) {
+				prev = g.set(p.y, p.x, poss.get(j));
+				if (!solve(g, nextPoint(g))) {
+					g.set(p.y, p.x, prev);
 					continue;
-				else
+				} else
 					return true;
 			}
-			
+
 			return false;
 		}
 	}
@@ -92,7 +87,7 @@ public class GameSolver {
 		}
 		return res;
 	}
-	
+
 	@SuppressWarnings("unused")
 	private static void displayEditable(SudokuGame g) {
 		for (Cell[] ca : g.cells) {

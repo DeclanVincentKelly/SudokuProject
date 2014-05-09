@@ -4,3 +4,4 @@
 /holding
 /def
 *.game
+/prevGameState.ser

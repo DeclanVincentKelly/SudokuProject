@@ -103,8 +103,10 @@ public class SudokuGame implements SudokuSerializable {
 	 * @param v
 	 *            the value to set the <code>Cell</code>'s contents to
 	 */
-	public void set(int x, int y, int v) {
+	public int set(int x, int y, int v) {
+		int prev = cells[x][y].getContent();
 		cells[x][y].setContent(v);
+		return prev;
 	}
 
 	/**
