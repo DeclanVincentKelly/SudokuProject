@@ -1,50 +1,13 @@
 package game;
 
 import java.awt.Point;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class GameSolver {
-
-	private static SudokuGame g = new SudokuGame("Final");
-
-	// C:\Users\Declan\workspace\SudokuProject\def\Default Library\Easy\E001.game
-
-	public static void main(String[] args) {
-		
-		// Loading
-		SudokuGame temp = null;
-		try {
-			temp = (SudokuGame) (new ObjectInputStream(new FileInputStream("C:\\Users\\Declan\\workspace\\SudokuProject\\def\\Default Library\\Easy\\E003.game"))).readObject();
-		} catch (ClassNotFoundException | IOException e) {
-			e.printStackTrace();
-		}
-
-		for (Cell[] ca : temp.cells)
-			for (Cell c : ca) {
-				g.set(c.getPoint().x, c.getPoint().y, c.getContent());
-				if (c.getContent() != 0)
-					g.get(c.getPoint().x, c.getPoint().y).setEditable(false);
-			}
-
-		// Solving
-
-		displayGrid(g);
-
-		System.out.println();
-
-		System.out.println("Starting");
-		System.out.println();
-
-		System.out.println(solve(g, nextPoint(g)));
-
-		System.out.println();
-		System.out.println("Ending");
-
-		displayGrid(g);
+	
+	public static boolean solveGame(SudokuGame g) {
+		return solve(g, nextPoint(g));
 	}
 
 	private static boolean solve(SudokuGame g, Point p) {
@@ -104,6 +67,7 @@ public class GameSolver {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static void displayGrid(SudokuGame g) {
 		for (Cell[] ca : g.cells) {
 			for (Cell c : ca) {

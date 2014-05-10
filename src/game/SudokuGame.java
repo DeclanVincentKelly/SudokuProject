@@ -168,5 +168,14 @@ public class SudokuGame implements SudokuSerializable {
 	public File getSave() {
 		return save;
 	}
+	
+	public boolean hasDuplicates() {
+		for (Region[] ra : regions)
+			for (Region r : ra)
+				if(r.getDuplicates().length != 0)
+					return true;
+		return false;
+	}
+		
 
 }

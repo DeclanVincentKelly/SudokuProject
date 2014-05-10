@@ -2,6 +2,7 @@ package gui;
 
 //TODO Finish Javadoc
 
+import game.GameSolver;
 import game.SudokuGame;
 
 import java.awt.Color;
@@ -22,6 +23,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
@@ -369,6 +371,30 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 
 		});
 		game.add(setValues);
+		
+		game.addSeparator();
+		
+		JMenuItem solve = new JMenuItem(new AbstractAction("Solve Game") {
+
+			{
+				this.putValue(MNEMONIC_KEY, KeyEvent.VK_S);
+			}
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				SudokuGame current = ((SudokuBoard)gameTabs.getSelectedComponent()).getGame();
+				if(current.hasDuplicates()) {
+					JOptionPane.showMessageDialog(null, "Remove all duplicates!");
+					return;
+				}
+				if(!GameSolver.solveGame(current))
+					JOptionPane.showMessageDialog(null, "This game can't be solved!");
+				current.refresh();
+				repaint();
+			}
+
+		});
+		game.add(solve);
 
 		bar.add(file);
 		bar.add(view);
