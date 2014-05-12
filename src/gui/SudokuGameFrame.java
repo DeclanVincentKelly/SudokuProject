@@ -2,11 +2,13 @@ package gui;
 
 //TODO Finish Javadoc
 
-import game.SudokuSolver;
 import game.SudokuGame;
+import game.SudokuSolver;
 
+import java.awt.AWTKeyStroke;
 import java.awt.Color;
 import java.awt.Image;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
@@ -15,9 +17,13 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -93,7 +99,7 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 			}
 
 		});
-		
+
 		chooser.setFileFilter(new FileFilter() {
 
 			@Override
@@ -105,10 +111,31 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 			public String getDescription() {
 				return "Sudoku Games (*.game)";
 			}
-			
+
 		});
-		
-		//TODO Add actions for changing game tabs with CTRL+TAB or CTRL+SHIFT+TAB
+
+		setupTabTraversalKeys(gameTabs);
+	}
+
+	// Add actions for changing game tabs with CTRL+TAB or CTRL+SHIFT+TAB
+	private static void setupTabTraversalKeys(JTabbedPane tabbedPane) {
+		KeyStroke ctrlTab = KeyStroke.getKeyStroke("ctrl TAB");
+		KeyStroke ctrlShiftTab = KeyStroke.getKeyStroke("ctrl shift TAB");
+
+		// Remove ctrl-tab from normal focus traversal
+		Set<AWTKeyStroke> forwardKeys = new HashSet<AWTKeyStroke>(tabbedPane.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
+		forwardKeys.remove(ctrlTab);
+		tabbedPane.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, forwardKeys);
+
+		// Remove ctrl-shift-tab from normal focus traversal
+		Set<AWTKeyStroke> backwardKeys = new HashSet<AWTKeyStroke>(tabbedPane.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
+		backwardKeys.remove(ctrlShiftTab);
+		tabbedPane.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, backwardKeys);
+
+		// Add keys to the tab's input map
+		InputMap inputMap = tabbedPane.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+		inputMap.put(ctrlTab, "navigateNext");
+		inputMap.put(ctrlShiftTab, "navigatePrevious");
 	}
 
 	public void run() {
@@ -123,7 +150,7 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 		gameReg.loadState(prevFileGame);
 		if (gameReg.isEmpty())
 			return false;
-		else {			
+		else {
 			for (SudokuGame g : gameReg.values())
 				addGame(g);
 
@@ -256,7 +283,7 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				SudokuGame g = ((SudokuBoard) gameTabs.getSelectedComponent()).getGame();
-				
+
 				chooser.setSelectedFile(new File(g.getName() + "." + g.getSuffix()));
 				int result = chooser.showSaveDialog(SudokuGameFrame.this);
 				if (result == JFileChooser.APPROVE_OPTION) {
@@ -282,7 +309,7 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 					if (g.isSaved()) {
 						SudokuRegister.save(g);
 					} else {
-						
+
 						chooser.setSelectedFile(new File(g.getName() + "." + g.getSuffix()));
 						int result = chooser.showSaveDialog(SudokuGameFrame.this);
 						if (result == JFileChooser.APPROVE_OPTION) {
@@ -317,11 +344,11 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 		JMenu view = new JMenu("View");
 		view.setMnemonic(KeyEvent.VK_V);
 
-		//TODO Finish menu item
+		// TODO Finish menu item
 		JMenuItem highlighting = new JMenuItem("Turn Off Highlighting", KeyEvent.VK_O);
 		view.add(highlighting);
 
-		//TODO Finish menu item
+		// TODO Finish menu item
 		JMenuItem changeColors = new JMenuItem("Change Color Scheme", KeyEvent.VK_C);
 		view.add(changeColors);
 
@@ -330,19 +357,19 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 		JMenu game = new JMenu("Game");
 		game.setMnemonic(KeyEvent.VK_G);
 
-		//TODO Finish menu item
+		// TODO Finish menu item
 		JMenuItem undo = new JMenuItem("Undo", KeyEvent.VK_U);
 		undo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, ActionEvent.CTRL_MASK));
 		game.add(undo);
 
-		//TODO Finish menu item
+		// TODO Finish menu item
 		JMenuItem redo = new JMenuItem("Redo", KeyEvent.VK_R);
 		redo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, ActionEvent.CTRL_MASK));
 		game.add(redo);
 
 		game.addSeparator();
 
-		//TODO Finish menu item
+		// TODO Finish menu item
 		JMenuItem renameGame = new JMenuItem("Rename Game", KeyEvent.VK_R);
 		redo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, ActionEvent.CTRL_MASK));
 		game.add(renameGame);
@@ -367,9 +394,9 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 
 		});
 		game.add(setValues);
-		
+
 		game.addSeparator();
-		
+
 		JMenuItem solve = new JMenuItem(new AbstractAction("Solve Game") {
 
 			{
@@ -378,12 +405,12 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				SudokuGame current = ((SudokuBoard)gameTabs.getSelectedComponent()).getGame();
-				if(current.hasDuplicates()) {
+				SudokuGame current = ((SudokuBoard) gameTabs.getSelectedComponent()).getGame();
+				if (current.hasDuplicates()) {
 					JOptionPane.showMessageDialog(null, "Remove all duplicates!");
 					return;
 				}
-				if(!SudokuSolver.solveGame(current))
+				if (!SudokuSolver.solveGame(current))
 					JOptionPane.showMessageDialog(null, "This game can't be solved!");
 				current.refresh();
 				repaint();
