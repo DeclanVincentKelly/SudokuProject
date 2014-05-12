@@ -4,8 +4,8 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class GameSolver {
-	
+public class SudokuSolver {
+
 	public static boolean solveGame(SudokuGame g) {
 		return solve(g, nextPoint(g));
 	}
@@ -17,8 +17,8 @@ public class GameSolver {
 			ArrayList<Integer> poss = calculatePossible(g, p);
 			Integer prev = 0;
 
-			for (int j = 0; j < poss.size(); j++) {
-				prev = g.set(p.y, p.x, poss.get(j));
+			for (Integer i : poss) {
+				prev = g.set(p.y, p.x, i);
 				if (!solve(g, nextPoint(g))) {
 					g.set(p.y, p.x, prev);
 					continue;
@@ -49,38 +49,6 @@ public class GameSolver {
 			}
 		}
 		return res;
-	}
-
-	@SuppressWarnings("unused")
-	private static void displayEditable(SudokuGame g) {
-		for (Cell[] ca : g.cells) {
-			for (Cell c : ca) {
-				if ((c.getPoint().x + 1) % 3 == 0)
-					System.out.print((c.isEditable() ? "T" : "F") + " | ");
-				else
-					System.out.print((c.isEditable() ? "T" : "F") + "  ");
-			}
-			if ((ca[0].getPoint().y + 1) % 3 == 0 && ca[0].getPoint().y != 8)
-				System.out.println("\n------------------------------");
-			else
-				System.out.println();
-		}
-	}
-
-	@SuppressWarnings("unused")
-	private static void displayGrid(SudokuGame g) {
-		for (Cell[] ca : g.cells) {
-			for (Cell c : ca) {
-				if ((c.getPoint().x + 1) % 3 == 0)
-					System.out.print(c.getContent() + " | ");
-				else
-					System.out.print(c.getContent() + "  ");
-			}
-			if ((ca[0].getPoint().y + 1) % 3 == 0 && ca[0].getPoint().y != 8)
-				System.out.println("\n------------------------------");
-			else
-				System.out.println();
-		}
 	}
 
 }

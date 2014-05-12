@@ -2,7 +2,7 @@ package gui;
 
 //TODO Finish Javadoc
 
-import game.GameSolver;
+import game.SudokuSolver;
 import game.SudokuGame;
 
 import java.awt.Color;
@@ -107,6 +107,8 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 			}
 			
 		});
+		
+		//TODO Add actions for changing game tabs with CTRL+TAB or CTRL+SHIFT+TAB
 	}
 
 	public void run() {
@@ -134,9 +136,6 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 		gameTabs.addTab(g.getName(), new SudokuBoard(g));
 	}
 
-
-
-	// TODO Add actions
 	private void addMenuItems(JMenuBar bar) {
 		JMenu file = new JMenu("File");
 		file.setMnemonic(KeyEvent.VK_F);
@@ -318,40 +317,37 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 		JMenu view = new JMenu("View");
 		view.setMnemonic(KeyEvent.VK_V);
 
+		//TODO Finish menu item
 		JMenuItem highlighting = new JMenuItem("Turn Off Highlighting", KeyEvent.VK_O);
 		view.add(highlighting);
 
+		//TODO Finish menu item
 		JMenuItem changeColors = new JMenuItem("Change Color Scheme", KeyEvent.VK_C);
 		view.add(changeColors);
 
 		view.addSeparator();
 
-		JMenuItem nextTab = new JMenuItem("Next Tab", KeyEvent.VK_N);
-		nextTab.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, ActionEvent.CTRL_MASK));
-		view.add(nextTab);
-
-		JMenuItem prevTab = new JMenuItem("Previous Tab", KeyEvent.VK_P);
-		prevTab.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, ActionEvent.CTRL_MASK));
-		view.add(prevTab);
-
 		JMenu game = new JMenu("Game");
 		game.setMnemonic(KeyEvent.VK_G);
 
+		//TODO Finish menu item
 		JMenuItem undo = new JMenuItem("Undo", KeyEvent.VK_U);
 		undo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, ActionEvent.CTRL_MASK));
 		game.add(undo);
 
+		//TODO Finish menu item
 		JMenuItem redo = new JMenuItem("Redo", KeyEvent.VK_R);
 		redo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, ActionEvent.CTRL_MASK));
 		game.add(redo);
 
 		game.addSeparator();
 
+		//TODO Finish menu item
 		JMenuItem renameGame = new JMenuItem("Rename Game", KeyEvent.VK_R);
 		redo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, ActionEvent.CTRL_MASK));
 		game.add(renameGame);
 
-		JMenuItem setValues = new JMenuItem(new AbstractAction("Edit Constant Values") {
+		JMenuItem setValues = new JMenuItem(new AbstractAction("Edit Constants") {
 
 			{
 				this.putValue(MNEMONIC_KEY, KeyEvent.VK_V);
@@ -387,7 +383,7 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 					JOptionPane.showMessageDialog(null, "Remove all duplicates!");
 					return;
 				}
-				if(!GameSolver.solveGame(current))
+				if(!SudokuSolver.solveGame(current))
 					JOptionPane.showMessageDialog(null, "This game can't be solved!");
 				current.refresh();
 				repaint();
