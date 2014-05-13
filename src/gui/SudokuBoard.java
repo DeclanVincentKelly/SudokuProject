@@ -28,7 +28,7 @@ public class SudokuBoard extends JPanel {
 
 	private final SudokuGame game;
 	private static final Color backgroundColor = Color.WHITE;
-	private static final Color defaultColor = Color.BLACK;
+	private static final Color defaultColor = SudokuGame.getDefaultColors()[0];
 	private static final int cellSize = 55;
 	private static final int borderWidth = 6;
 	private static final int dx = 20, dy = 40;
@@ -124,7 +124,9 @@ public class SudokuBoard extends JPanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (engaged && !editConstant) {
-				game.get(selection.y, selection.x).setContent(Integer.parseInt(String.valueOf(getValue(NAME))));
+				int parsed = Integer.parseInt(String.valueOf(getValue(NAME)));
+				game.registerTurn(game.get(selection.y, selection.x), game.get(selection.y, selection.x).getContent(), parsed);
+				game.get(selection.y, selection.x).setContent(parsed);
 				repaint();
 			}
 		}
@@ -135,13 +137,13 @@ public class SudokuBoard extends JPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if(!editConstant)
+			if (!editConstant)
 				engaged = !engaged;
 			else {
 				game.get(selection.y, selection.x).setEditable(!game.get(selection.y, selection.x).isEditable());
 				repaint();
 			}
-				
+
 			repaint();
 		}
 	}
@@ -161,6 +163,8 @@ public class SudokuBoard extends JPanel {
 						game.get(i, j).setContent((x - 1) < 0 ? x + 9 : (x - 1) % 10);
 					else
 						game.get(i, j).setContent((x + 1) < 0 ? x + 9 : (x + 1) % 10);
+
+					game.registerTurn(game.get(i, j), x, game.get(i, j).getContent());
 				}
 			}
 		}
@@ -196,7 +200,7 @@ public class SudokuBoard extends JPanel {
 		if (!editConstant) {
 			drawBoxes(g2);
 			drawOccupants(g2);
-			if(game.isWon())
+			if (game.isWon())
 				drawWin();
 		} else {
 			drawConstantBoxes(g2);
@@ -231,7 +235,7 @@ public class SudokuBoard extends JPanel {
 					g.setColor(Color.BLACK);
 
 				g.fill(boxes[i][j]);
-				
+
 				if (game.get(i, j).getPoint().equals(selection) && engaged) {
 					if (game.get(i, j).isEditable())
 						g.setColor(Color.BLACK);
@@ -284,16 +288,16 @@ public class SudokuBoard extends JPanel {
 
 		g.setColor(defaultColor);
 	}
-	
+
 	private void drawWin() {
-		//TODO Complete the win animation
+		// TODO Complete the win animation
 	}
 
 	@Override
 	public Dimension getPreferredSize() {
 		return SudokuBoard.getBoardPreferredSize();
 	}
-	
+
 	public static Dimension getBoardPreferredSize() {
 		int l = (int) ((2 * (borderWidth - 1)) + (boxLength * (cellSize + 4)) + (2 * (boxLength - 1)) + (2 * borderWidth));
 		return new Dimension(l, l);
@@ -321,7 +325,7 @@ public class SudokuBoard extends JPanel {
 
 	public void setEditConstant(boolean v) {
 		editConstant = v;
-		if(v)
+		if (v)
 			engaged = true;
 		else
 			engaged = false;

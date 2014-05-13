@@ -18,6 +18,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import javax.imageio.ImageIO;
@@ -119,23 +120,23 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 
 	// Add actions for changing game tabs with CTRL+TAB or CTRL+SHIFT+TAB
 	private static void setupTabTraversalKeys(JTabbedPane tabbedPane) {
-		KeyStroke ctrlTab = KeyStroke.getKeyStroke("ctrl TAB");
-		KeyStroke ctrlShiftTab = KeyStroke.getKeyStroke("ctrl shift TAB");
+		KeyStroke forwardTab = KeyStroke.getKeyStroke("ctrl TAB");
+		KeyStroke backwardTab = KeyStroke.getKeyStroke("ctrl shift TAB");
 
 		// Remove ctrl-tab from normal focus traversal
 		Set<AWTKeyStroke> forwardKeys = new HashSet<AWTKeyStroke>(tabbedPane.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
-		forwardKeys.remove(ctrlTab);
+		forwardKeys.remove(forwardTab);
 		tabbedPane.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, forwardKeys);
 
 		// Remove ctrl-shift-tab from normal focus traversal
 		Set<AWTKeyStroke> backwardKeys = new HashSet<AWTKeyStroke>(tabbedPane.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
-		backwardKeys.remove(ctrlShiftTab);
+		backwardKeys.remove(backwardTab);
 		tabbedPane.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, backwardKeys);
 
 		// Add keys to the tab's input map
 		InputMap inputMap = tabbedPane.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-		inputMap.put(ctrlTab, "navigateNext");
-		inputMap.put(ctrlShiftTab, "navigatePrevious");
+		inputMap.put(forwardTab, "navigateNext");
+		inputMap.put(backwardTab, "navigatePrevious");
 	}
 
 	public void run() {
@@ -344,40 +345,73 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 		JMenu view = new JMenu("View");
 		view.setMnemonic(KeyEvent.VK_V);
 
-		// TODO Finish menu item
-		JMenuItem highlighting = new JMenuItem("Turn Off Highlighting", KeyEvent.VK_O);
+		JMenuItem highlighting = new JMenuItem(new AbstractAction("Toggle Highlighting") {
+
+			{
+				this.putValue(MNEMONIC_KEY, KeyEvent.VK_O);
+			}
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				SudokuBoard current = (SudokuBoard) gameTabs.getSelectedComponent();
+				current.getGame().toggleHighlighting();
+				current.repaint();
+			}
+
+		});
 		view.add(highlighting);
 
 		// TODO Finish menu item
 		JMenuItem changeColors = new JMenuItem("Change Color Scheme", KeyEvent.VK_C);
 		view.add(changeColors);
 
-		view.addSeparator();
-
 		JMenu game = new JMenu("Game");
 		game.setMnemonic(KeyEvent.VK_G);
 
-		// TODO Finish menu item
-		JMenuItem undo = new JMenuItem("Undo", KeyEvent.VK_U);
-		undo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, ActionEvent.CTRL_MASK));
+		JMenuItem undo = new JMenuItem(new AbstractAction("Undo") {
+
+			{
+				this.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Z, ActionEvent.CTRL_MASK));
+				this.putValue(MNEMONIC_KEY, KeyEvent.VK_U);
+			}
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				SudokuBoard temp = (SudokuBoard) gameTabs.getSelectedComponent();
+				try {
+					temp.getGame().undo();
+				} catch (NoSuchElementException e1) {}
+				temp.repaint();
+			}
+
+		});
 		game.add(undo);
 
-		// TODO Finish menu item
-		JMenuItem redo = new JMenuItem("Redo", KeyEvent.VK_R);
-		redo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, ActionEvent.CTRL_MASK));
+		JMenuItem redo = new JMenuItem(new AbstractAction("Redo") {
+
+			{
+				this.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Y, ActionEvent.CTRL_MASK));
+				this.putValue(MNEMONIC_KEY, KeyEvent.VK_R);
+			}
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				SudokuBoard temp = (SudokuBoard) gameTabs.getSelectedComponent();
+				try {
+					temp.getGame().redo();
+				} catch (NoSuchElementException e1) {}
+				temp.repaint();
+			}
+
+		});
 		game.add(redo);
 
 		game.addSeparator();
 
-		// TODO Finish menu item
-		JMenuItem renameGame = new JMenuItem("Rename Game", KeyEvent.VK_R);
-		redo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, ActionEvent.CTRL_MASK));
-		game.add(renameGame);
-
 		JMenuItem setValues = new JMenuItem(new AbstractAction("Edit Constants") {
 
 			{
-				this.putValue(MNEMONIC_KEY, KeyEvent.VK_V);
+				this.putValue(MNEMONIC_KEY, KeyEvent.VK_C);
 				this.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK));
 			}
 

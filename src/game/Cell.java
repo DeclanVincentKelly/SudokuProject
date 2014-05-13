@@ -39,15 +39,15 @@ public class Cell implements Serializable {
 	 * <code>content</code> and <code>content</code> to 0 and
 	 * <code>Color.BLACK</code>
 	 */
-	public Cell(Point p) {
-		this(0, Color.BLACK, p);
+	public Cell(Point p, Color c) {
+		this(0, c, p);
 	}
 
 	/**
 	 * 
 	 */
-	public Cell(int x, int y) {
-		this(0, Color.BLACK, new Point(x, y));
+	public Cell(int x, int y, Color c) {
+		this(0, c, new Point(x, y));
 	}
 
 	/**
@@ -119,7 +119,6 @@ public class Cell implements Serializable {
 	
 	@Override
 	public String toString() {
-		//return point + ":" + color + ":" + cellContent;
-		return Integer.toString(cellContent);
+		return "[" + point + ":" + color + ":" + cellContent + "]";
 	}
 }

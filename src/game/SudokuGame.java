@@ -5,9 +5,11 @@ package game;
 import gui.SudokuSerializable;
 
 import java.awt.Color;
+import java.awt.Point;
 import java.io.File;
 import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 
 public class SudokuGame implements SudokuSerializable {
 
@@ -25,18 +27,22 @@ public class SudokuGame implements SudokuSerializable {
 	 */
 	private Region[][] regions = new Region[3][9];
 
+	private static final Color STANDARD = new Color(0x000000);
+	private static final Color COMPLETE = new Color(0x30DB00);
+	private static final Color DUPLICATE = new Color(0xD42F2F);
+
+	private Color standard = STANDARD;
+	private Color complete = COMPLETE;
+	private Color duplicate = DUPLICATE;
+	private String name;
+	private File save;
+	private boolean highlighting = true;
+	
 	/**
 	 * The two stacks in charge of any undo/redo operations
 	 */
-	@SuppressWarnings("unused")
-	private ArrayDeque<Turn> history, future;
-
-	private static final Color defaultColor = new Color(0x000000);
-	private static final Color completeColor = new Color(0x30DB00);
-	private static final Color duplicateColor = new Color(0xD42F2F);
-
-	private String name;
-	private File save;
+	private ArrayDeque<Turn> history = new ArrayDeque<Turn>();
+	private ArrayDeque<Turn> future = new ArrayDeque<Turn>();
 
 	/**
 	 * Constructs a new SudokuGame with a completely blank board and given name
@@ -46,34 +52,34 @@ public class SudokuGame implements SudokuSerializable {
 
 		for (int y = 0; y < cells.length; y++)
 			for (int x = 0; x < cells[y].length; x++)
-				cells[y][x] = new Cell(x, y);
+				cells[y][x] = new Cell(x, y, standard);
 
-		//Rows
+		// Rows
 		for (int i = 0; i < regions[0].length; i++) {
 			Cell[] region = Arrays.copyOfRange(cells[i], 0, cells[i].length);
 			regions[0][i] = new Region(region);
-			
-			for(Cell c: Arrays.copyOfRange(cells[i], 0, cells[i].length))
+
+			for (Cell c : Arrays.copyOfRange(cells[i], 0, cells[i].length))
 				c.setRegion(0, regions[0][i]);
 		}
 
-		//Columns
+		// Columns
 		for (int i = 0; i < regions[1].length; i++) {
 			Cell[] region = new Cell[] { cells[0][0 + i], cells[1][0 + i], cells[2][0 + i], cells[3][0 + i], cells[4][0 + i], cells[5][0 + i], cells[6][0 + i], cells[7][0 + i], cells[8][0 + i] };
 			regions[1][i] = new Region(region);
-			
-			for(Cell c: region)
+
+			for (Cell c : region)
 				c.setRegion(1, regions[1][i]);
 		}
-			
-		//Squares
+
+		// Squares
 		int j = 0;
 		for (int i = 0; i < 3; i++)
 			for (int x = 0; x < 3; x++) {
 				Cell[] region = new Cell[] { cells[0 + (3 * i)][0 + (3 * x)], cells[0 + (3 * i)][1 + (3 * x)], cells[0 + (3 * i)][2 + (3 * x)], cells[1 + (3 * i)][0 + (3 * x)], cells[1 + (3 * i)][1 + (3 * x)], cells[1 + (3 * i)][2 + (3 * x)], cells[2 + (3 * i)][0 + (3 * x)], cells[2 + (3 * i)][1 + (3 * x)], cells[2 + (3 * i)][2 + (3 * x)] };
 				regions[2][j] = new Region(region);
-				
-				for(Cell c: region)
+
+				for (Cell c : region)
 					c.setRegion(2, regions[2][j]);
 				j++;
 			}
@@ -123,23 +129,24 @@ public class SudokuGame implements SudokuSerializable {
 	public void refresh() {
 		for (Region[] ra : regions)
 			for (Region r : ra)
-				r.colorAll(defaultColor);
+				r.colorAll(standard);
+		if (highlighting) {
+			for (Region[] ra : regions)
+				for (Region r : ra)
+					if (r.isComplete())
+						r.colorAll(complete);
 
-		for (Region[] ra : regions)
-			for (Region r : ra)
-				if (r.isComplete())
-					r.colorAll(completeColor);
-
-		for (Region[] ra : regions)
-			for (Region r : ra)
-				for (Cell c : r.getDuplicates())
-					c.setColor(duplicateColor);
+			for (Region[] ra : regions)
+				for (Region r : ra)
+					for (Cell c : r.getDuplicates())
+						c.setColor(duplicate);
+		}
 	}
-	
+
 	public boolean isWon() {
 		for (Region[] ra : regions)
 			for (Region r : ra)
-				if(!r.isComplete() || r.getDuplicates().length != 0)
+				if (!r.isComplete() || r.getDuplicates().length != 0)
 					return false;
 		return true;
 	}
@@ -168,14 +175,49 @@ public class SudokuGame implements SudokuSerializable {
 	public File getSave() {
 		return save;
 	}
-	
+
 	public boolean hasDuplicates() {
 		for (Region[] ra : regions)
 			for (Region r : ra)
-				if(r.getDuplicates().length != 0)
+				if (r.getDuplicates().length != 0)
 					return true;
 		return false;
 	}
-		
+	
+	public void registerTurn(Cell c, int pre, int post) {
+		if (future.size() != 0)
+			future.clear();
+		history.push(new Turn(c, pre, post));
+	}
+	
+	public void undo() throws NoSuchElementException {
+		Turn un = history.pop();
+		Point p = un.getChanged().getPoint();	
+		future.push(un);
+		cells[p.y][p.x].setContent(un.getPrevValue());
+		this.refresh();
+	}
+	
+	public void redo() throws NoSuchElementException {
+		Turn un = future.pop();
+		Point p = un.getChanged().getPoint();	
+		history.push(un);
+		cells[p.y][p.x].setContent(un.getPostValue());
+		this.refresh();
+	}
+
+	public void setColors(Color s, Color c, Color d) {
+		this.standard = s;
+		this.complete = c;
+		this.duplicate = d;
+	}
+
+	public void toggleHighlighting() {
+		highlighting = !highlighting;
+	}
+
+	public static Color[] getDefaultColors() {
+		return new Color[] { STANDARD, COMPLETE, DUPLICATE };
+	}
 
 }
