@@ -38,7 +38,7 @@ public class SudokuSolver {
 		return null;
 	}
 
-	private static ArrayList<Integer> calculatePossible(SudokuGame g, Point p) {
+	public static ArrayList<Integer> calculatePossible(SudokuGame g, Point p) {
 		ArrayList<Integer> res = new ArrayList<Integer>();
 		res.addAll(Arrays.asList(new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 }));
 		Cell sel = g.cells[p.y][p.x];

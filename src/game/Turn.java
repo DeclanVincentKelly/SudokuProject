@@ -1,7 +1,6 @@
 package game;
 
 //TODO Finish Javadoc
-//TODO Finish implementation
 
 import java.io.Serializable;
 
@@ -42,7 +41,6 @@ public class Turn implements Serializable {
 	
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
 		return "(" + changed + ": " + prevValue + " -> " + postValue + ")";
 	}
 }

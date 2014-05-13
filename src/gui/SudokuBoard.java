@@ -3,6 +3,7 @@ package gui;
 //TODO Finish Javadoc
 
 import game.SudokuGame;
+import game.SudokuSolver;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -14,8 +15,10 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.util.ArrayList;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -55,6 +58,7 @@ public class SudokuBoard extends JPanel {
 		});
 
 		addKeyBindings();
+		setToolTipText("");
 	}
 
 	private void addKeyBindings() {
@@ -200,8 +204,6 @@ public class SudokuBoard extends JPanel {
 		if (!editConstant) {
 			drawBoxes(g2);
 			drawOccupants(g2);
-			if (game.isWon())
-				drawWin();
 		} else {
 			drawConstantBoxes(g2);
 			drawFadedContents(g2);
@@ -289,10 +291,6 @@ public class SudokuBoard extends JPanel {
 		g.setColor(defaultColor);
 	}
 
-	private void drawWin() {
-		// TODO Complete the win animation
-	}
-
 	@Override
 	public Dimension getPreferredSize() {
 		return SudokuBoard.getBoardPreferredSize();
@@ -329,5 +327,16 @@ public class SudokuBoard extends JPanel {
 			engaged = true;
 		else
 			engaged = false;
+	}
+
+	@Override
+	public String getToolTipText(MouseEvent event) {
+		Point p = event.getPoint();
+		ArrayList<Integer> poss = new ArrayList<Integer>();
+		for (int i = 0; i < boxes.length; i++)
+			for (int j = 0; j < boxes[i].length; j++)
+				if (boxes[i][j].contains(p))
+					poss = SudokuSolver.calculatePossible(game, new Point(j, i));
+		return "Possibilities: " + poss.toString();
 	}
 }

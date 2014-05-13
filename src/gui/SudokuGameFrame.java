@@ -10,6 +10,7 @@ import java.awt.Color;
 import java.awt.Image;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
 import java.awt.event.KeyEvent;
@@ -17,23 +18,32 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
+import javax.swing.Box;
 import javax.swing.InputMap;
+import javax.swing.JColorChooser;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.colorchooser.AbstractColorChooserPanel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 
 @SuppressWarnings("serial")
@@ -43,6 +53,7 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 	private JMenuBar menu = new JMenuBar();
 	private SudokuRegister<SudokuGame> gameReg = new SudokuRegister<SudokuGame>();
 	private JFileChooser chooser = new JFileChooser(new File(System.getProperty("user.dir")));
+	private JLabel winDisplay = new JLabel("");
 
 	private static final String prevFileGame = "prevGameState.ser";
 
@@ -114,6 +125,20 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 			}
 
 		});
+
+		gameTabs.addChangeListener(new ChangeListener() {
+
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				if (((SudokuBoard) gameTabs.getSelectedComponent()).getGame().isWon())
+					winDisplay.setText("You Won This Game!");
+				else
+					winDisplay.setText("");
+			}
+
+		});
+		if (((SudokuBoard) gameTabs.getSelectedComponent()).getGame().isWon())
+			winDisplay.setText("You Won This Game!");
 
 		setupTabTraversalKeys(gameTabs);
 	}
@@ -361,8 +386,46 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 		});
 		view.add(highlighting);
 
-		// TODO Finish menu item
-		JMenuItem changeColors = new JMenuItem("Change Color Scheme", KeyEvent.VK_C);
+		JMenuItem changeColors = new JMenuItem(new AbstractAction("Change Color Scheme") {
+
+			{
+				this.putValue(MNEMONIC_KEY, KeyEvent.VK_C);
+			}
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				final ArrayList<Color> colors = new ArrayList<Color>();
+				String[] titles = { "Choose a base color", "Choose a region complete color", "Choose a duplicate color" };
+				final JColorChooser chooser = new JColorChooser();
+				chooser.setPreviewPanel(new JPanel());
+				for (AbstractColorChooserPanel a : chooser.getChooserPanels()) {
+					if (a.getDisplayName().equals("Swatches"))
+						chooser.setChooserPanels(new AbstractColorChooserPanel[] { a });
+				}
+				for (String title : titles) {
+					JDialog dialog = JColorChooser.createDialog(SudokuGameFrame.this, title, true, chooser, new ActionListener() {
+
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							colors.add(chooser.getColor());
+						}
+
+					}, new ActionListener() {
+
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							colors.add(Color.BLACK);
+						}
+					});
+					dialog.setVisible(true);
+				}
+
+				SudokuBoard board = (SudokuBoard) gameTabs.getSelectedComponent();
+				board.getGame().setColors(colors.get(0), colors.get(1), colors.get(2));
+				board.repaint();
+			}
+
+		});
 		view.add(changeColors);
 
 		JMenu game = new JMenu("Game");
@@ -380,7 +443,8 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 				SudokuBoard temp = (SudokuBoard) gameTabs.getSelectedComponent();
 				try {
 					temp.getGame().undo();
-				} catch (NoSuchElementException e1) {}
+				} catch (NoSuchElementException e1) {
+				}
 				temp.repaint();
 			}
 
@@ -399,7 +463,8 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 				SudokuBoard temp = (SudokuBoard) gameTabs.getSelectedComponent();
 				try {
 					temp.getGame().redo();
-				} catch (NoSuchElementException e1) {}
+				} catch (NoSuchElementException e1) {
+				}
 				temp.repaint();
 			}
 
@@ -446,6 +511,8 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 				}
 				if (!SudokuSolver.solveGame(current))
 					JOptionPane.showMessageDialog(null, "This game can't be solved!");
+				else
+					winDisplay.setText("You Won This Game!");
 				current.refresh();
 				repaint();
 			}
@@ -456,6 +523,8 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 		bar.add(file);
 		bar.add(view);
 		bar.add(game);
+		bar.add(Box.createHorizontalStrut(330));
+		bar.add(winDisplay);
 	}
 
 }
