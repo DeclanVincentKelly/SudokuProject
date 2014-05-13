@@ -130,7 +130,10 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				if (((SudokuBoard) gameTabs.getSelectedComponent()).getGame().isWon())
+				SudokuBoard temp = (SudokuBoard) gameTabs.getSelectedComponent();
+				if (temp == null)
+					return;
+				if (temp.getGame().isWon())
 					winDisplay.setText("You Won This Game!");
 				else
 					winDisplay.setText("");
@@ -245,6 +248,8 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				SudokuBoard temp = (SudokuBoard) gameTabs.getSelectedComponent();
+				if (temp == null)
+					return;
 				gameReg.deregister(gameReg.indexOf(temp.getGame()));
 				gameTabs.remove(temp);
 				repaint();
@@ -281,7 +286,10 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				SudokuGame g = ((SudokuBoard) gameTabs.getSelectedComponent()).getGame();
+				SudokuBoard temp = (SudokuBoard) gameTabs.getSelectedComponent();
+				if (temp == null)
+					return;
+				SudokuGame g = temp.getGame();
 				if (g.isSaved()) {
 					SudokuRegister.save(g);
 				} else {
@@ -308,7 +316,10 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				SudokuGame g = ((SudokuBoard) gameTabs.getSelectedComponent()).getGame();
+				SudokuBoard temp = (SudokuBoard) gameTabs.getSelectedComponent();
+				if (temp == null)
+					return;
+				SudokuGame g = temp.getGame();
 
 				chooser.setSelectedFile(new File(g.getName() + "." + g.getSuffix()));
 				int result = chooser.showSaveDialog(SudokuGameFrame.this);
@@ -379,6 +390,8 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				SudokuBoard current = (SudokuBoard) gameTabs.getSelectedComponent();
+				if (current == null)
+					return;
 				current.getGame().toggleHighlighting();
 				current.repaint();
 			}
@@ -394,6 +407,9 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				SudokuBoard board = (SudokuBoard) gameTabs.getSelectedComponent();
+				if (board == null)
+					return;
 				final ArrayList<Color> colors = new ArrayList<Color>();
 				String[] titles = { "Choose a base color", "Choose a region complete color", "Choose a duplicate color" };
 				final JColorChooser chooser = new JColorChooser();
@@ -420,7 +436,6 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 					dialog.setVisible(true);
 				}
 
-				SudokuBoard board = (SudokuBoard) gameTabs.getSelectedComponent();
 				board.getGame().setColors(colors.get(0), colors.get(1), colors.get(2));
 				board.repaint();
 			}
@@ -441,6 +456,8 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				SudokuBoard temp = (SudokuBoard) gameTabs.getSelectedComponent();
+				if (temp == null)
+					return;
 				try {
 					temp.getGame().undo();
 				} catch (NoSuchElementException e1) {
@@ -461,6 +478,8 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				SudokuBoard temp = (SudokuBoard) gameTabs.getSelectedComponent();
+				if (temp == null)
+					return;
 				try {
 					temp.getGame().redo();
 				} catch (NoSuchElementException e1) {
@@ -482,7 +501,9 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				SudokuBoard b = (SudokuBoard) gameTabs.getComponentAt(gameTabs.getSelectedIndex());
+				SudokuBoard b = (SudokuBoard) gameTabs.getSelectedComponent();
+				if (b == null)
+					return;
 				if (!b.getEditConstant())
 					b.setBackground(new Color(120, 120, 120));
 				else
@@ -504,7 +525,10 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				SudokuGame current = ((SudokuBoard) gameTabs.getSelectedComponent()).getGame();
+				SudokuBoard temp = (SudokuBoard) gameTabs.getSelectedComponent();
+				if (temp == null)
+					return;
+				SudokuGame current = temp.getGame();
 				if (current.hasDuplicates()) {
 					JOptionPane.showMessageDialog(null, "Remove all duplicates!");
 					return;
