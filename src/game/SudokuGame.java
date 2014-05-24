@@ -1,7 +1,5 @@
 package game;
 
-//TODO Finish Javadoc
-
 import gui.SudokuSerializable;
 
 import java.awt.Color;
@@ -11,6 +9,19 @@ import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 
+/**
+ * A game construct that contains all of the exacts board {@code Cells} and
+ * {@code Regions}, as well as other information such as the {@code Color}
+ * scheme that the {@code SudokuBoard} will draw, the save location of the
+ * {@code SudokuGame} stored as a {@code File}, and the {@code String} name of
+ * the particular {@code SudokuGame} which is used for graphical presentation.
+ * The {@code SudokuGame} is also responsible for reporting state information
+ * about the game, and updating the {@code Colors} of each individual
+ * {@code Cell}.
+ * 
+ * @author Declan
+ *
+ */
 public class SudokuGame implements SudokuSerializable {
 
 	private static final long serialVersionUID = -1549447228701748191L;
@@ -37,7 +48,7 @@ public class SudokuGame implements SudokuSerializable {
 	private String name;
 	private File save;
 	private boolean highlighting = true;
-	
+
 	/**
 	 * The two stacks in charge of any undo/redo operations
 	 */
@@ -116,16 +127,28 @@ public class SudokuGame implements SudokuSerializable {
 	}
 
 	/**
-	 * @return the name
+	 * @return the name of this {@code SudokuGame}
 	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * Sets the name of this {@code SudokuGame}
+	 * 
+	 * @param n
+	 *            the {@code String} to set the name to
+	 */
 	public void setName(String n) {
 		name = n;
 	}
 
+	/**
+	 * Colors every {@code Region} in the {@code SudokuGame} to the standard
+	 * {@code Color}, then checks for complete {@code Regions}, and for
+	 * duplicates within {@code Regions} and colors both of those cases
+	 * differently.
+	 */
 	public void refresh() {
 		for (Region[] ra : regions)
 			for (Region r : ra)
@@ -143,6 +166,9 @@ public class SudokuGame implements SudokuSerializable {
 		}
 	}
 
+	/**
+	 * @return whether or not the {@code SudokuGame} is finished.
+	 */
 	public boolean isWon() {
 		for (Region[] ra : regions)
 			for (Region r : ra)
@@ -176,6 +202,10 @@ public class SudokuGame implements SudokuSerializable {
 		return save;
 	}
 
+	/**
+	 * @return whether or not the game contains duplicate numbers within
+	 *         {@code Regions}
+	 */
 	public boolean hasDuplicates() {
 		for (Region[] ra : regions)
 			for (Region r : ra)
@@ -183,39 +213,80 @@ public class SudokuGame implements SudokuSerializable {
 					return true;
 		return false;
 	}
-	
-	public void registerTurn(Cell c, int pre, int post) {
+
+	/**
+	 * Registers a turn, so that the user can undo or redo {@code Turns}
+	 * 
+	 * @param c
+	 *            the {@code Cell} that changed value
+	 * @param pre
+	 *            the {@code int} value before the change
+	 * @param post
+	 *            the {@code int} value after the change
+	 */
+	public void registerTurn(Cell c, int pre) {
 		if (future.size() != 0)
 			future.clear();
-		history.push(new Turn(c, pre, post));
+		history.push(new Turn(c, pre));
 	}
-	
+
+	/**
+	 * Handles the undoing of {@code Turns} and registering the {@code Turn} for
+	 * redoing
+	 * 
+	 * @throws NoSuchElementException
+	 */
 	public void undo() throws NoSuchElementException {
 		Turn un = history.pop();
-		Point p = un.getChanged().getPoint();	
+		Point p = un.getChanged().getPoint();
 		future.push(un);
 		cells[p.y][p.x].setContent(un.getPrevValue());
 		this.refresh();
 	}
-	
+
+	/**
+	 * Handles the redoing of {@code Turns} and reregistering the {@code Turn}
+	 * for undoing
+	 * 
+	 * @throws NoSuchElementException
+	 */
 	public void redo() throws NoSuchElementException {
 		Turn un = future.pop();
-		Point p = un.getChanged().getPoint();	
+		Point p = un.getChanged().getPoint();
 		history.push(un);
 		cells[p.y][p.x].setContent(un.getPostValue());
 		this.refresh();
 	}
 
+	/**
+	 * Changes the value of the three different {@code Colors} that make up the
+	 * {@code SudokuBoard}
+	 * 
+	 * @param s
+	 *            the standard {@code Color} to change to
+	 * @param c
+	 *            the complete {@code Color} to change to
+	 * @param d
+	 *            the duplicate {@code Color} to change to
+	 */
 	public void setColors(Color s, Color c, Color d) {
 		this.standard = s;
 		this.complete = c;
 		this.duplicate = d;
 	}
 
+	/**
+	 * Toggles the color scheme of the {@code SudokuBoard} from only standard,
+	 * to highlighting for completeness and duplicates, as well as vice versa
+	 */
 	public void toggleHighlighting() {
 		highlighting = !highlighting;
 	}
 
+	/**
+	 * @return the color scheme of the {@code SudokuBoard} with the standard at
+	 *         array[0], complete at array[1], and duplicate at array[2]
+	 */
 	public static Color[] getDefaultColors() {
 		return new Color[] { STANDARD, COMPLETE, DUPLICATE };
 	}

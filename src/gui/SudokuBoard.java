@@ -3,7 +3,7 @@ package gui;
 //TODO Finish Javadoc
 
 import game.SudokuGame;
-import game.SudokuSolver;
+import game.SudokuSolverToolkit;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -129,7 +129,7 @@ public class SudokuBoard extends JPanel {
 		public void actionPerformed(ActionEvent e) {
 			if (engaged && !editConstant) {
 				int parsed = Integer.parseInt(String.valueOf(getValue(NAME)));
-				game.registerTurn(game.get(selection.y, selection.x), game.get(selection.y, selection.x).getContent(), parsed);
+				game.registerTurn(game.get(selection.y, selection.x), game.get(selection.y, selection.x).getContent());
 				game.get(selection.y, selection.x).setContent(parsed);
 				repaint();
 			}
@@ -168,7 +168,7 @@ public class SudokuBoard extends JPanel {
 					else
 						game.get(i, j).setContent((x + 1) < 0 ? x + 9 : (x + 1) % 10);
 
-					game.registerTurn(game.get(i, j), x, game.get(i, j).getContent());
+					game.registerTurn(game.get(i, j), x);
 				}
 			}
 		}
@@ -325,8 +325,6 @@ public class SudokuBoard extends JPanel {
 		editConstant = v;
 		if (v)
 			engaged = true;
-		else
-			engaged = false;
 	}
 
 	@Override
@@ -336,7 +334,8 @@ public class SudokuBoard extends JPanel {
 		for (int i = 0; i < boxes.length; i++)
 			for (int j = 0; j < boxes[i].length; j++)
 				if (boxes[i][j].contains(p))
-					poss = SudokuSolver.calculatePossible(game, new Point(j, i));
+					poss = SudokuSolverToolkit.calculatePossible(game, new Point(j, i));
 		return "Possibilities: " + poss.toString();
 	}
+
 }

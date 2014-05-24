@@ -1,5 +1,7 @@
 package gui;
 
+//TODO Finish Javadoc
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -12,9 +14,6 @@ import java.util.Collection;
 
 public class SudokuRegister<T extends SudokuSerializable> implements Serializable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 5580281115018204171L;
 
 	private ArrayList<T> registered = new ArrayList<T>();

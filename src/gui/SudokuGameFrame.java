@@ -3,7 +3,7 @@ package gui;
 //TODO Finish Javadoc
 
 import game.SudokuGame;
-import game.SudokuSolver;
+import game.SudokuSolverToolkit;
 
 import java.awt.AWTKeyStroke;
 import java.awt.Color;
@@ -25,14 +25,12 @@ import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
-import javax.swing.Box;
 import javax.swing.InputMap;
 import javax.swing.JColorChooser;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -42,8 +40,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.colorchooser.AbstractColorChooserPanel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 
 @SuppressWarnings("serial")
@@ -53,7 +49,6 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 	private JMenuBar menu = new JMenuBar();
 	private SudokuRegister<SudokuGame> gameReg = new SudokuRegister<SudokuGame>();
 	private JFileChooser chooser = new JFileChooser(new File(System.getProperty("user.dir")));
-	private JLabel winDisplay = new JLabel("");
 
 	private static final String prevFileGame = "prevGameState.ser";
 
@@ -125,23 +120,6 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 			}
 
 		});
-
-		gameTabs.addChangeListener(new ChangeListener() {
-
-			@Override
-			public void stateChanged(ChangeEvent e) {
-				SudokuBoard temp = (SudokuBoard) gameTabs.getSelectedComponent();
-				if (temp == null)
-					return;
-				if (temp.getGame().isWon())
-					winDisplay.setText("You Won This Game!");
-				else
-					winDisplay.setText("");
-			}
-
-		});
-		if (((SudokuBoard) gameTabs.getSelectedComponent()).getGame().isWon())
-			winDisplay.setText("You Won This Game!");
 
 		setupTabTraversalKeys(gameTabs);
 	}
@@ -533,10 +511,9 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 					JOptionPane.showMessageDialog(null, "Remove all duplicates!");
 					return;
 				}
-				if (!SudokuSolver.solveGame(current))
+				if (!SudokuSolverToolkit.solveGame(current))
 					JOptionPane.showMessageDialog(null, "This game can't be solved!");
-				else
-					winDisplay.setText("You Won This Game!");
+
 				current.refresh();
 				repaint();
 			}
@@ -547,8 +524,6 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 		bar.add(file);
 		bar.add(view);
 		bar.add(game);
-		bar.add(Box.createHorizontalStrut(330));
-		bar.add(winDisplay);
 	}
 
 }
