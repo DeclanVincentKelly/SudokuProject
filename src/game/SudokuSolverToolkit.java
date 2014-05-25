@@ -68,7 +68,7 @@ public class SudokuSolverToolkit {
 	 * @param g
 	 *            the {@code SudokuGame} to count solutions for
 	 * @return the number of solutions for the passed in {@code SudokuGame}
-	 * @see #countSolutions(SudokuGame, Point)
+	 * @see #numSolutions(SudokuGame, Point)
 	 */
 	public static int countSolutions(SudokuGame g) {
 		return numSolutions(g, nextPoint(g));
@@ -82,7 +82,6 @@ public class SudokuSolverToolkit {
 	 *            the {@code Point} that the solver should start the tree of
 	 *            solutions from
 	 * @return the number of solutions for the passed in {@code SudokuGame}
-	 * @see #countSolutions(SudokuGame, Point)
 	 */
 	private static int numSolutions(SudokuGame g, Point p) {
 		if (g.isWon())

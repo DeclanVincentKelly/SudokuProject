@@ -1,7 +1,5 @@
 package gui;
 
-//TODO Finish Javadoc
-
 import game.SudokuGame;
 import game.SudokuSolverToolkit;
 
@@ -42,20 +40,58 @@ import javax.swing.SwingUtilities;
 import javax.swing.colorchooser.AbstractColorChooserPanel;
 import javax.swing.filechooser.FileFilter;
 
+/**
+ * This class is responsible for the construction and management of the GUI for
+ * the entire program.
+ * 
+ * @author Declan
+ *
+ */
 @SuppressWarnings("serial")
 public class SudokuGameFrame extends JFrame implements Runnable {
 
+	/**
+	 * This manages all of the different tabs within the GUI that display
+	 * {@code SudokuBoards}
+	 */
 	private JTabbedPane gameTabs = new JTabbedPane(JTabbedPane.BOTTOM);
+
+	/**
+	 * The menu that contains the different functions related the management and
+	 * playing of {@code SudokuGames}
+	 */
 	private JMenuBar menu = new JMenuBar();
+
+	/**
+	 * This register is in charge of maintaining the state of the different
+	 * active games after the exiting of the GUI
+	 */
 	private SudokuRegister<SudokuGame> gameReg = new SudokuRegister<SudokuGame>();
+
+	/**
+	 * Used for several I/O operations with regards to the {@code SudokuGames}
+	 */
 	private JFileChooser chooser = new JFileChooser(new File(System.getProperty("user.dir")));
 
+	/**
+	 * The filename of the serialized {@code SudokuRegister}
+	 */
 	private static final String prevFileGame = "prevGameState.ser";
 
+	/**
+	 * Runs the GUI
+	 * 
+	 * @param args
+	 * @see SwingUtilities#invokeLater(Runnable)
+	 */
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new SudokuGameFrame());
 	}
 
+	/**
+	 * Constructs and initializes a {@code SudokuGameFrame}, which functions as
+	 * the GUI managers and as the entry point for this application
+	 */
 	public SudokuGameFrame() {
 		super("Sudoku");
 
@@ -124,7 +160,14 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 		setupTabTraversalKeys(gameTabs);
 	}
 
-	// Add actions for changing game tabs with CTRL+TAB or CTRL+SHIFT+TAB
+	/**
+	 * Adds CTRL+TAB and CTRL+SHIFT+TAB as accelerators for changing the focus
+	 * the {@code JTabbedPane} from tab to tab
+	 * 
+	 * @param tabbedPane
+	 *            the {@code JTabbedPane} to add CTRL+TAB and CTRL+SHIFT+TAB tab
+	 *            changing functionality to
+	 */
 	private static void setupTabTraversalKeys(JTabbedPane tabbedPane) {
 		KeyStroke forwardTab = KeyStroke.getKeyStroke("ctrl TAB");
 		KeyStroke backwardTab = KeyStroke.getKeyStroke("ctrl shift TAB");
@@ -145,6 +188,9 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 		inputMap.put(backwardTab, "navigatePrevious");
 	}
 
+	/**
+	 * Runs the GUI
+	 */
 	public void run() {
 		setResizable(false);
 		setLocation(100, 100);
@@ -153,6 +199,13 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 		setVisible(true);
 	}
 
+	/**
+	 * Loads the {@code SudokuRegister} from serialized form and loads every
+	 * {@code SudokuGame} that it has saved
+	 * 
+	 * @return whether or not there are any {@code SudokuGames} in the saved
+	 *         registry
+	 */
 	private boolean loadPrevious() {
 		gameReg.loadState(prevFileGame);
 		if (gameReg.isEmpty())
@@ -165,11 +218,25 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 		}
 	}
 
+	/**
+	 * Adds a specified {@code SudokuGame} to the {@code JTabbedPane} and to the
+	 * {@code SudokuRegister}
+	 * 
+	 * @param g
+	 *            the {@code SudokuGame} to add to the {@code JTabbedPane} and
+	 *            to the {@code SudokuRegister}
+	 */
 	private void addGame(SudokuGame g) {
 		gameReg.register(g);
 		gameTabs.addTab(g.getName(), new SudokuBoard(g));
 	}
 
+	/**
+	 * Sets up the main menu bar
+	 * 
+	 * @param bar
+	 *            the {@code JMenuBar} to add the sub-menus and items to
+	 */
 	private void addMenuItems(JMenuBar bar) {
 		JMenu file = new JMenu("File");
 		file.setMnemonic(KeyEvent.VK_F);

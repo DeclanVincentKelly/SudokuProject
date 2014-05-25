@@ -156,7 +156,7 @@ public class Cell implements Serializable {
 	}
 
 	/**
-	 * @param c
+	 * @param b
 	 *            the {@code boolean} to set the editablility of the
 	 *            {@code Cell} to.
 	 */

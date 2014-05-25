@@ -27,36 +27,89 @@ public class SudokuGame implements SudokuSerializable {
 	private static final long serialVersionUID = -1549447228701748191L;
 
 	/**
-	 * This array represents the game board with 81 individual cells capable of
-	 * different content and color
+	 * An array of {@code Cell} objects that represent the 81 different
+	 * {@code Cells} on a regular Sudoku board
 	 */
 	protected Cell[][] cells = new Cell[9][9];
 
 	/**
-	 * This array represents the different regions of the board that must have
-	 * their requirements fulfilled in order to win
+	 * An array of {@code Region} objects that represent the various rows,
+	 * columns, and boxes that are part of the Sudoku game
 	 */
 	private Region[][] regions = new Region[3][9];
 
-	private static final Color STANDARD = new Color(0x000000);
-	private static final Color COMPLETE = new Color(0x30DB00);
-	private static final Color DUPLICATE = new Color(0xD42F2F);
+	/**
+	 * The default color for the {@code Cells} and the values displayed
+	 * on-screen if the {@code Cell} isn't a duplicate or part of a complete
+	 * {@code Region}
+	 */
+	public static final Color STANDARD = new Color(0x000000);
 
+	/**
+	 * The default color for a complete {@code Region}
+	 */
+	public static final Color COMPLETE = new Color(0x30DB00);
+
+	/**
+	 * The default value for a {@code Cell} that contains a value that is
+	 * duplicated somewhere in one of the {@code Regions} that contains the same
+	 * {@code Cell}
+	 */
+	public static final Color DUPLICATE = new Color(0xD42F2F);
+
+	/**
+	 * The {@code Color} object that is actually used to paint the the
+	 * {@code SudokuBoard}
+	 */
 	private Color standard = STANDARD;
+
+	/**
+	 * The {@code Color} object that is actually used to paint completed
+	 * {@code Regions} on the {@code SudokuBoard}
+	 */
 	private Color complete = COMPLETE;
+
+	/**
+	 * The {@code Color} object that is actually used to paint duplicate
+	 * {@code Cells} on the {@code SudokuBoard}
+	 */
 	private Color duplicate = DUPLICATE;
+
+	/**
+	 * The {@code String} name of the {@code SudokuGame}
+	 */
 	private String name;
+
+	/**
+	 * The {@code File} object representing the save location of the
+	 * {@code SudokuGame}
+	 */
 	private File save;
+
+	/**
+	 * The boolean representing whethe or not this {@code SudokuGame} adds
+	 * special highlighting to its {@code Cells}
+	 */
 	private boolean highlighting = true;
 
 	/**
-	 * The two stacks in charge of any undo/redo operations
+	 * The stack that stores the history of the {@code SudokuGame}
 	 */
 	private ArrayDeque<Turn> history = new ArrayDeque<Turn>();
+
+	/**
+	 * The stack that stores the undone changes, before they are erased or
+	 * redone
+	 */
 	private ArrayDeque<Turn> future = new ArrayDeque<Turn>();
 
 	/**
-	 * Constructs a new SudokuGame with a completely blank board and given name
+	 * Constructs and initializes a new SudokuGame with a completely blank board
+	 * and given name
+	 * 
+	 * @param n
+	 *            the {@code String} name of the newly constructed
+	 *            {@code SudokuGame}
 	 */
 	public SudokuGame(String n) {
 		name = n;
@@ -119,6 +172,7 @@ public class SudokuGame implements SudokuSerializable {
 	 *            the y value of the <code>Cell</code> to set
 	 * @param v
 	 *            the value to set the <code>Cell</code>'s contents to
+	 * @return the value that {@code Cell} previously contained
 	 */
 	public int set(int x, int y, int v) {
 		int prev = cells[x][y].getContent();
@@ -221,8 +275,6 @@ public class SudokuGame implements SudokuSerializable {
 	 *            the {@code Cell} that changed value
 	 * @param pre
 	 *            the {@code int} value before the change
-	 * @param post
-	 *            the {@code int} value after the change
 	 */
 	public void registerTurn(Cell c, int pre) {
 		if (future.size() != 0)
@@ -235,6 +287,7 @@ public class SudokuGame implements SudokuSerializable {
 	 * redoing
 	 * 
 	 * @throws NoSuchElementException
+	 *             If the history of the {@code SudokuGame} is empty
 	 */
 	public void undo() throws NoSuchElementException {
 		Turn un = history.pop();
@@ -249,6 +302,7 @@ public class SudokuGame implements SudokuSerializable {
 	 * for undoing
 	 * 
 	 * @throws NoSuchElementException
+	 *             If the future of the {@code SudokuGame} is emptys
 	 */
 	public void redo() throws NoSuchElementException {
 		Turn un = future.pop();
