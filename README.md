@@ -1,4 +1,4 @@
 SudokuProject
 =============
 
-A ongoing GUI based program for the playing, editing, and organizing of Sudoku games.
+A ongoing GUI based program for the playing and editing of Sudoku games.
