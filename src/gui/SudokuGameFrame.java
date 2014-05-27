@@ -341,7 +341,10 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 					chooser.setSelectedFile(new File(g.getName()));
 					int result = chooser.showSaveDialog(SudokuGameFrame.this);
 					if (result == JFileChooser.APPROVE_OPTION) {
-						g.setName(chooser.getSelectedFile().getName().substring(0, chooser.getSelectedFile().getName().indexOf(g.getSuffix()) - 1));
+						if (chooser.getSelectedFile().getName().endsWith(g.getSuffix()))
+							g.setName(chooser.getSelectedFile().getName().substring(0, chooser.getSelectedFile().getName().indexOf(g.getSuffix()) - 1));
+						else
+							g.setName(chooser.getSelectedFile().getName());
 						g.setSave(chooser.getSelectedFile());
 						SudokuRegister.save(g);
 						gameTabs.setTitleAt(gameTabs.getSelectedIndex(), g.getName());
@@ -369,7 +372,10 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 				chooser.setSelectedFile(new File(g.getName() + "." + g.getSuffix()));
 				int result = chooser.showSaveDialog(SudokuGameFrame.this);
 				if (result == JFileChooser.APPROVE_OPTION) {
-					g.setName(chooser.getSelectedFile().getName().substring(0, chooser.getSelectedFile().getName().indexOf(g.getSuffix()) - 1));
+					if (chooser.getSelectedFile().getName().endsWith(g.getSuffix()))
+						g.setName(chooser.getSelectedFile().getName().substring(0, chooser.getSelectedFile().getName().indexOf(g.getSuffix()) - 1));
+					else
+						g.setName(chooser.getSelectedFile().getName());
 					g.setSave(chooser.getSelectedFile());
 					SudokuRegister.save(g);
 					gameTabs.setTitleAt(gameTabs.getSelectedIndex(), g.getName());
@@ -387,20 +393,26 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				int i = 0;
 				for (SudokuGame g : gameReg.values()) {
 					if (g.isSaved()) {
 						SudokuRegister.save(g);
 					} else {
-
 						chooser.setSelectedFile(new File(g.getName() + "." + g.getSuffix()));
 						int result = chooser.showSaveDialog(SudokuGameFrame.this);
 						if (result == JFileChooser.APPROVE_OPTION) {
-							g.setName(chooser.getSelectedFile().getName().substring(0, chooser.getSelectedFile().getName().indexOf(g.getSuffix()) - 1));
+							if (chooser.getSelectedFile().getName().endsWith(g.getSuffix()))
+								g.setName(chooser.getSelectedFile().getName().substring(0, chooser.getSelectedFile().getName().indexOf(g.getSuffix()) - 1));
+							else
+								g.setName(chooser.getSelectedFile().getName());
 							g.setSave(chooser.getSelectedFile());
 							SudokuRegister.save(g);
-							gameTabs.setTitleAt(gameTabs.getSelectedIndex(), g.getName());
+							gameTabs.setTitleAt(i, g.getName());
+
 						}
+						SudokuGameFrame.this.pack();
 					}
+					i++;
 				}
 			}
 
