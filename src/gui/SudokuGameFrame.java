@@ -241,6 +241,7 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 		JMenu file = new JMenu("File");
 		file.setMnemonic(KeyEvent.VK_F);
 
+		// Creates a new SudokuGame with the name "Unsaved Game"
 		JMenuItem newGame = new JMenuItem(new AbstractAction("New Game") {
 
 			{
@@ -259,6 +260,8 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 		});
 		file.add(newGame);
 
+		// Opens a game from a .game file with the displayed name as the name of
+		// the file
 		JMenuItem openGame = new JMenuItem(new AbstractAction("Open Game") {
 
 			{
@@ -283,6 +286,7 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 
 		file.addSeparator();
 
+		// Closes the current game without saving
 		JMenuItem close = new JMenuItem(new AbstractAction("Close Current Game") {
 
 			{
@@ -303,6 +307,7 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 		});
 		file.add(close);
 
+		// Closes every game without saving
 		JMenuItem closeAll = new JMenuItem(new AbstractAction("Close All Games") {
 
 			{
@@ -322,6 +327,8 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 
 		file.addSeparator();
 
+		// Saves a game. If previously unsaved sets the displayed name to the
+		// name of the created file. Else overwrites current save file
 		JMenuItem save = new JMenuItem(new AbstractAction("Save") {
 
 			{
@@ -355,6 +362,8 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 		});
 		file.add(save);
 
+		// Saves the game under the new filename specified in the file selector
+		// dialog
 		JMenuItem saveAs = new JMenuItem(new AbstractAction("Save As") {
 
 			{
@@ -385,6 +394,7 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 		});
 		file.add(saveAs);
 
+		// Applies the save function to every game
 		JMenuItem saveAll = new JMenuItem(new AbstractAction("Save All") {
 
 			{
@@ -421,6 +431,7 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 
 		file.addSeparator();
 
+		// Exits the program allowing for the game to perform last operations
 		JMenuItem exit = new JMenuItem(new AbstractAction("Exit") {
 
 			{
@@ -438,6 +449,7 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 		JMenu view = new JMenu("View");
 		view.setMnemonic(KeyEvent.VK_V);
 
+		// Toggles the colors on the board
 		JMenuItem highlighting = new JMenuItem(new AbstractAction("Toggle Highlighting") {
 
 			{
@@ -456,6 +468,8 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 		});
 		view.add(highlighting);
 
+		// Changes the color scheme of the board with a series of color selector
+		// dialogs
 		JMenuItem changeColors = new JMenuItem(new AbstractAction("Change Color Scheme") {
 
 			{
@@ -503,6 +517,8 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 		JMenu game = new JMenu("Game");
 		game.setMnemonic(KeyEvent.VK_G);
 
+		// Adds an undo function. Current problems: register every change of
+		// number with a mouse scroll. Also cannot undo a solve.
 		JMenuItem undo = new JMenuItem(new AbstractAction("Undo") {
 
 			{
@@ -525,6 +541,7 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 		});
 		game.add(undo);
 
+		// Redos an operations. Current problems: same as undo
 		JMenuItem redo = new JMenuItem(new AbstractAction("Redo") {
 
 			{
@@ -549,6 +566,7 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 
 		game.addSeparator();
 
+		// Sets the boxes whose values cannot be edited
 		JMenuItem setValues = new JMenuItem(new AbstractAction("Edit Constants") {
 
 			{
@@ -574,6 +592,7 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 
 		game.addSeparator();
 
+		// Solves the game with a brute force backtracking method
 		JMenuItem solve = new JMenuItem(new AbstractAction("Solve Game") {
 
 			{
