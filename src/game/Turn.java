@@ -47,26 +47,26 @@ public class Turn implements Serializable {
 	/**
 	 * @return the {@code Cell} that underwent a change
 	 */
-	public Cell getChanged() {
+	public Cell getCell() {
 		return changed;
 	}
 
 	/**
 	 * @return the previous value of the changed {@code Cell}
 	 */
-	public int getPrevValue() {
-		return prevValue;
+	public void undoChange() {
+		changed.setContent(prevValue);
 	}
 
 	/**
 	 * @return the value of the {@code Cell} after it changed
 	 */
-	public int getPostValue() {
-		return postValue;
+	public void redoChange() {
+		changed.setContent(postValue);
 	}
 
 	@Override
 	public String toString() {
-		return "(" + changed + ": " + prevValue + " -> " + postValue + ")";
+		return "[(" + changed.getPoint().x + ", " + changed.getPoint().y + "): " + prevValue + " -> " + postValue + "]";
 	}
 }

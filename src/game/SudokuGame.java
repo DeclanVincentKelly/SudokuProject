@@ -3,7 +3,6 @@ package game;
 import gui.SudokuSerializable;
 
 import java.awt.Color;
-import java.awt.Point;
 import java.io.File;
 import java.util.ArrayDeque;
 import java.util.Arrays;
@@ -85,12 +84,6 @@ public class SudokuGame implements SudokuSerializable {
 	 * {@code SudokuGame}
 	 */
 	private File save;
-
-	/**
-	 * The boolean representing whethe or not this {@code SudokuGame} adds
-	 * special highlighting to its {@code Cells}
-	 */
-	private boolean highlighting = true;
 
 	/**
 	 * The stack that stores the history of the {@code SudokuGame}
@@ -207,17 +200,15 @@ public class SudokuGame implements SudokuSerializable {
 		for (Region[] ra : regions)
 			for (Region r : ra)
 				r.colorAll(standard);
-		if (highlighting) {
-			for (Region[] ra : regions)
-				for (Region r : ra)
-					if (r.isComplete())
-						r.colorAll(complete);
+		for (Region[] ra : regions)
+			for (Region r : ra)
+				if (r.isComplete())
+					r.colorAll(complete);
 
-			for (Region[] ra : regions)
-				for (Region r : ra)
-					for (Cell c : r.getDuplicates())
-						c.setColor(duplicate);
-		}
+		for (Region[] ra : regions)
+			for (Region r : ra)
+				for (Cell c : r.getDuplicates())
+					c.setColor(duplicate);
 	}
 
 	/**
@@ -286,14 +277,16 @@ public class SudokuGame implements SudokuSerializable {
 	 * Handles the undoing of {@code Turns} and registering the {@code Turn} for
 	 * redoing
 	 * 
-	 * @throws NoSuchElementException
-	 *             If the history of the {@code SudokuGame} is empty
 	 */
-	public void undo() throws NoSuchElementException {
-		Turn un = history.pop();
-		Point p = un.getChanged().getPoint();
+	public void undo() {
+		Turn un = null;
+		try {
+			un = history.pop();
+		} catch (NoSuchElementException e) {
+			return;
+		}
 		future.push(un);
-		cells[p.y][p.x].setContent(un.getPrevValue());
+		un.undoChange();
 		this.refresh();
 	}
 
@@ -301,14 +294,16 @@ public class SudokuGame implements SudokuSerializable {
 	 * Handles the redoing of {@code Turns} and reregistering the {@code Turn}
 	 * for undoing
 	 * 
-	 * @throws NoSuchElementException
-	 *             If the future of the {@code SudokuGame} is emptys
 	 */
-	public void redo() throws NoSuchElementException {
-		Turn un = future.pop();
-		Point p = un.getChanged().getPoint();
+	public void redo() {
+		Turn un = null;
+		try {
+			un = future.pop();
+		} catch (NoSuchElementException e) {
+			return;
+		}
 		history.push(un);
-		cells[p.y][p.x].setContent(un.getPostValue());
+		un.redoChange();
 		this.refresh();
 	}
 
@@ -327,14 +322,6 @@ public class SudokuGame implements SudokuSerializable {
 		this.standard = s;
 		this.complete = c;
 		this.duplicate = d;
-	}
-
-	/**
-	 * Toggles the color scheme of the {@code SudokuBoard} from only standard,
-	 * to highlighting for completeness and duplicates, as well as vice versa
-	 */
-	public void toggleHighlighting() {
-		highlighting = !highlighting;
 	}
 
 	/**

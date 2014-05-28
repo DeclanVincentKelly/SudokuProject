@@ -18,7 +18,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 import javax.imageio.ImageIO;
@@ -77,6 +76,18 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 	 * The filename of the serialized {@code SudokuRegister}
 	 */
 	private static final String prevFileGame = "prevGameState.ser";
+
+	/**
+	 * Boolean that determines for the objects that actually draw the board,
+	 * whether or not to turn on highlighting
+	 */
+	protected static boolean highlighting = true;
+
+	/**
+	 * Boolean that determines for the objects that actually draw the board,
+	 * whether or not to turn on tooltips
+	 */
+	protected static boolean tooltips = true;
 
 	/**
 	 * Runs the GUI
@@ -228,7 +239,9 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 	 */
 	private void addGame(SudokuGame g) {
 		gameReg.register(g);
-		gameTabs.addTab(g.getName(), new SudokuBoard(g));
+		SudokuBoard b = new SudokuBoard(g);
+		gameTabs.addTab(g.getName(), b);
+		b.requestFocus();
 	}
 
 	/**
@@ -253,7 +266,6 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 			public void actionPerformed(ActionEvent e) {
 				SudokuGame g = new SudokuGame("Unsaved Game");
 				addGame(g);
-
 				repaint();
 			}
 
@@ -461,12 +473,31 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 				SudokuBoard current = (SudokuBoard) gameTabs.getSelectedComponent();
 				if (current == null)
 					return;
-				current.getGame().toggleHighlighting();
+				SudokuGameFrame.highlighting = !SudokuGameFrame.highlighting;
 				current.repaint();
 			}
 
 		});
 		view.add(highlighting);
+
+		// Toggles the colors on the board
+		JMenuItem tooltip = new JMenuItem(new AbstractAction("Toggle Tooltips") {
+
+			{
+				this.putValue(MNEMONIC_KEY, KeyEvent.VK_H);
+			}
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				SudokuBoard current = (SudokuBoard) gameTabs.getSelectedComponent();
+				if (current == null)
+					return;
+				SudokuGameFrame.tooltips = !SudokuGameFrame.tooltips;
+				current.repaint();
+			}
+
+		});
+		view.add(tooltip);
 
 		// Changes the color scheme of the board with a series of color selector
 		// dialogs
@@ -531,10 +562,7 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 				SudokuBoard temp = (SudokuBoard) gameTabs.getSelectedComponent();
 				if (temp == null)
 					return;
-				try {
-					temp.getGame().undo();
-				} catch (NoSuchElementException e1) {
-				}
+				temp.getGame().undo();
 				temp.repaint();
 			}
 
@@ -554,10 +582,7 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 				SudokuBoard temp = (SudokuBoard) gameTabs.getSelectedComponent();
 				if (temp == null)
 					return;
-				try {
-					temp.getGame().redo();
-				} catch (NoSuchElementException e1) {
-				}
+				temp.getGame().redo();
 				temp.repaint();
 			}
 
@@ -609,7 +634,9 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 					JOptionPane.showMessageDialog(null, "Remove all duplicates!");
 					return;
 				}
-				if (!SudokuSolverToolkit.solveGame(current))
+
+				boolean result = SudokuSolverToolkit.solveGame(current);
+				if (!result)
 					JOptionPane.showMessageDialog(null, "This game can't be solved!");
 
 				current.refresh();

@@ -224,8 +224,9 @@ public class SudokuBoard extends JPanel {
 		public void actionPerformed(ActionEvent e) {
 			if (engaged && !editConstant) {
 				int parsed = Integer.parseInt(String.valueOf(getValue(NAME)));
-				game.registerTurn(game.get(selection.y, selection.x), game.get(selection.y, selection.x).getContent());
+				int prev = game.get(selection.y, selection.x).getContent();
 				game.get(selection.y, selection.x).setContent(parsed);
+				game.registerTurn(game.get(selection.y, selection.x), prev);
 				repaint();
 			}
 		}
@@ -410,7 +411,11 @@ public class SudokuBoard extends JPanel {
 					g.setStroke(new BasicStroke(2));
 				}
 
-				g.setColor(game.get(i, j).getColor());
+				if (SudokuGameFrame.highlighting)
+					g.setColor(game.get(i, j).getColor());
+				else
+					g.setColor(defaultColor);
+
 				g.draw(boxes[i][j]);
 
 			}
@@ -431,7 +436,7 @@ public class SudokuBoard extends JPanel {
 		for (int i = 0; i < boxes.length; i++) {
 			for (int j = 0; j < boxes[i].length; j++) {
 				if (game.get(i, j).getContent() != 0) {
-					if (game.get(i, j).isEditable())
+					if (game.get(i, j).isEditable() && SudokuGameFrame.highlighting)
 						g.setColor(game.get(i, j).getColor().darker());
 					else
 						g.setColor(defaultColor);
@@ -495,13 +500,16 @@ public class SudokuBoard extends JPanel {
 
 	@Override
 	public String getToolTipText(MouseEvent event) {
-		Point p = event.getPoint();
-		ArrayList<Integer> poss = new ArrayList<Integer>();
-		for (int i = 0; i < boxes.length; i++)
-			for (int j = 0; j < boxes[i].length; j++)
-				if (boxes[i][j].contains(p))
-					poss = SudokuSolverToolkit.calculatePossible(game, new Point(j, i));
-		return "Possibilities: " + poss.toString();
+		if (SudokuGameFrame.tooltips) {
+			Point p = event.getPoint();
+			ArrayList<Integer> poss = new ArrayList<Integer>();
+			for (int i = 0; i < boxes.length; i++)
+				for (int j = 0; j < boxes[i].length; j++)
+					if (boxes[i][j].contains(p))
+						poss = SudokuSolverToolkit.calculatePossible(game, new Point(j, i));
+			return "Possibilities: " + poss.toString();
+		} else
+			return "";
 	}
 
 }
