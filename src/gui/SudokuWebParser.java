@@ -76,7 +76,7 @@ public class SudokuWebParser {
 			values.add(Integer.parseInt(m.group(1)));
 			String temp = m.group(2);
 			points.add(new Point(Integer.parseInt(temp.substring(1, 2)), Integer.parseInt(temp.substring(2, 3))));
-			count++;
+			count += 1;
 		}
 		if (count == 0)
 			return game;
