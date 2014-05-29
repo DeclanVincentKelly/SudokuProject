@@ -50,7 +50,6 @@ public class SudokuWebParser {
 			rd.close();
 		} catch (IOException e) {
 			e.printStackTrace();
-			result = "";
 		}
 
 		return result;
@@ -64,7 +63,7 @@ public class SudokuWebParser {
 	 *         database
 	 */
 	public static SudokuGame stripGame() {
-		String doc = getHTML("http://show.websudoku.com/?level=4&set_id=9582606826");
+		String doc = getHTML("http://show.websudoku.com/");
 		Pattern p = Pattern.compile("READONLY\\sVALUE=\"([^<>])\"\\sID=([^<>]{3})", Pattern.CASE_INSENSITIVE);
 		Matcher m = p.matcher(doc);
 		ArrayList<Point> points = new ArrayList<>();
