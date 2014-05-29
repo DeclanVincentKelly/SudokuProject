@@ -152,7 +152,7 @@ public class SudokuGame implements SudokuSerializable {
 	 *            the y value of the <code>Cell</code> to get
 	 * @return the <code>Cell</code> at the specified xy position
 	 */
-	public Cell get(int y, int x) {
+	public Cell get(int x, int y) {
 		return cells[x][y];
 	}
 
@@ -167,7 +167,7 @@ public class SudokuGame implements SudokuSerializable {
 	 *            the value to set the <code>Cell</code>'s contents to
 	 * @return the value that {@code Cell} previously contained
 	 */
-	public int set(int y, int x, int v) {
+	public int set(int x, int y, int v) {
 		int prev = cells[x][y].getContent();
 		cells[x][y].setContent(v);
 		return prev;

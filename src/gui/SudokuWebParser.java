@@ -5,6 +5,7 @@ import game.SudokuGame;
 
 import java.awt.Point;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -31,24 +32,25 @@ public class SudokuWebParser {
 	 *            The URL that the method will GET the HTML from
 	 * @return The HTML of the webpage specified
 	 */
-	private static String getHTML(String urlToRead) {
-		URL url;
+	private static String getHTML(String url) {
+		URL u;
 		HttpURLConnection conn;
 		BufferedReader rd;
 		String line;
 		String result = "";
 
 		try {
-			url = new URL(urlToRead);
-			conn = (HttpURLConnection) url.openConnection();
+			u = new URL(url);
+			conn = (HttpURLConnection) u.openConnection();
 			conn.setRequestMethod("GET");
 			rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 			while ((line = rd.readLine()) != null) {
 				result += line;
 			}
 			rd.close();
-		} catch (Exception e) {
+		} catch (IOException e) {
 			e.printStackTrace();
+			result = "";
 		}
 
 		return result;
@@ -62,19 +64,27 @@ public class SudokuWebParser {
 	 *         database
 	 */
 	public static SudokuGame stripGame() {
-		String doc = getHTML("http://show.websudoku.com/");
+		String doc = getHTML("http://show.websudoku.com/?level=4&set_id=9582606826");
 		Pattern p = Pattern.compile("READONLY\\sVALUE=\"([^<>])\"\\sID=([^<>]{3})", Pattern.CASE_INSENSITIVE);
 		Matcher m = p.matcher(doc);
 		ArrayList<Point> points = new ArrayList<>();
 		ArrayList<Integer> values = new ArrayList<>();
+		SudokuGame game = new SudokuGame("Unsaved Game");
+
+		int count = 0;
 		while (m.find()) {
 			values.add(Integer.parseInt(m.group(1)));
 			String temp = m.group(2);
 			points.add(new Point(Integer.parseInt(temp.substring(1, 2)), Integer.parseInt(temp.substring(2, 3))));
+			count++;
 		}
-		SudokuGame daily = new SudokuGame("Web Game");
-		fillGame(daily, values, points);
-		return daily;
+		if (count == 0)
+			return game;
+
+		game = new SudokuGame("Web Game");
+		fillGame(game, values, points);
+
+		return game;
 	}
 
 	/**
