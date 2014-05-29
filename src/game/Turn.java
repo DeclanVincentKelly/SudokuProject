@@ -52,14 +52,14 @@ public class Turn implements Serializable {
 	}
 
 	/**
-	 * @return the previous value of the changed {@code Cell}
+	 * Undoes the change
 	 */
 	public void undoChange() {
 		changed.setContent(prevValue);
 	}
 
 	/**
-	 * @return the value of the {@code Cell} after it changed
+	 * Redoes the change
 	 */
 	public void redoChange() {
 		changed.setContent(postValue);
