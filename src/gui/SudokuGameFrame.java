@@ -108,7 +108,7 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 
 		// Reload previous games if any
 		if (!loadPrevious())
-			addGame(new SudokuGame("Unsaved Game"));
+			addGame(SudokuWebParser.stripGame());
 
 		// Add icons
 		Image img = null;
@@ -588,6 +588,24 @@ public class SudokuGameFrame extends JFrame implements Runnable {
 
 		});
 		game.add(redo);
+
+		JMenuItem clear = new JMenuItem(new AbstractAction("Clear History") {
+
+			{
+				this.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Y, ActionEvent.CTRL_MASK));
+				this.putValue(MNEMONIC_KEY, KeyEvent.VK_R);
+			}
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				SudokuBoard temp = (SudokuBoard) gameTabs.getSelectedComponent();
+				if (temp == null)
+					return;
+				temp.getGame().clearHistory();
+			}
+
+		});
+		game.add(clear);
 
 		game.addSeparator();
 

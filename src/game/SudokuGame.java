@@ -152,7 +152,7 @@ public class SudokuGame implements SudokuSerializable {
 	 *            the y value of the <code>Cell</code> to get
 	 * @return the <code>Cell</code> at the specified xy position
 	 */
-	public Cell get(int x, int y) {
+	public Cell get(int y, int x) {
 		return cells[x][y];
 	}
 
@@ -167,7 +167,7 @@ public class SudokuGame implements SudokuSerializable {
 	 *            the value to set the <code>Cell</code>'s contents to
 	 * @return the value that {@code Cell} previously contained
 	 */
-	public int set(int x, int y, int v) {
+	public int set(int y, int x, int v) {
 		int prev = cells[x][y].getContent();
 		cells[x][y].setContent(v);
 		return prev;
@@ -305,6 +305,16 @@ public class SudokuGame implements SudokuSerializable {
 		history.push(un);
 		un.redoChange();
 		this.refresh();
+	}
+
+	/**
+	 * Clears the stack of {@code Turns} that handles the history of the
+	 * {@code SudokuGame}, as well as the the stack that manages the undone
+	 * {@code Turns}
+	 */
+	public void clearHistory() {
+		history.clear();
+		future.clear();
 	}
 
 	/**
