@@ -14,6 +14,7 @@
     </path>
     <target name="init">
         <mkdir dir="bin"/>
+        <mkdir dir="dist"/>
         <copy includeemptydirs="false" todir="bin">
             <fileset dir="src">
                 <exclude name="**/*.launch"/>
@@ -23,6 +24,7 @@
     </target>
     <target name="clean">
         <delete dir="bin"/>
+        <delete dir="dist"/>
     </target>
     <target depends="clean" name="cleanall"/>
     <target depends="build-subprojects,build-project" name="build"/>
@@ -33,6 +35,13 @@
             <src path="src"/>
             <classpath refid="SudokuProject.classpath"/>
         </javac>
+    </target>
+    <target depends="build" name="dist">
+        <jar destfile="dist/${ant.project.name}.jar" basedir="bin">
+            <manifest>
+                <attribute name="Main-Class" value="gui.SudokuGameFrame"/>
+            </manifest>
+        </jar>
     </target>
     <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
     <target description="copy Eclipse compiler jars to ant lib directory" name="init-eclipse-compiler">
